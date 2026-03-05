@@ -26,6 +26,13 @@ public class userProfile extends javax.swing.JFrame {
     public userProfile() {
         initComponents();
         loadUserProfile();
+        
+        if (!Session.isLoggedIn()) {
+        JOptionPane.showMessageDialog(this, "You must login first!");
+        login log = new login();
+        log.setVisible(true);
+        this.dispose();
+        }
     }
     
     private void loadUserProfile() {
@@ -67,7 +74,6 @@ public class userProfile extends javax.swing.JFrame {
         LBRole = new javax.swing.JLabel();
         LBName = new javax.swing.JLabel();
         LBEmail = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
 
         jLabel3.setText("jLabel3");
 
@@ -134,9 +140,6 @@ public class userProfile extends javax.swing.JFrame {
 
         jPanel2.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 160, 240, 110));
 
-        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        jPanel2.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 100, 170, 70));
-
         getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 530, 360));
 
         pack();
@@ -175,7 +178,6 @@ public class userProfile extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JLabel lbEmail;
     private javax.swing.JLabel lbName;
     private javax.swing.JLabel lbRole;

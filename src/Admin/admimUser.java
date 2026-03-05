@@ -2,6 +2,7 @@
 package Admin;
 
 import Main.login;
+import config.Session;
 import config.config;
 import java.awt.Color;
 import java.sql.Connection;
@@ -15,6 +16,13 @@ public class admimUser extends javax.swing.JFrame {
     public admimUser() {
         initComponents();
         getData();
+        
+        if (!Session.isLoggedIn()) {
+        JOptionPane.showMessageDialog(this, "You must login first!");
+        login log = new login();
+        log.setVisible(true);
+        this.dispose();
+        }
     }
 
     void getData(){

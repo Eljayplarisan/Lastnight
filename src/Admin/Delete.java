@@ -5,6 +5,8 @@
  */
 package Admin;
 
+import Main.login;
+import config.Session;
 import config.config;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -27,6 +29,13 @@ public class Delete extends javax.swing.JFrame {
     public Delete() {
         initComponents();
         getData();
+        
+        if (!Session.isLoggedIn()) {
+        JOptionPane.showMessageDialog(this, "You must login first!");
+        login log = new login();
+        log.setVisible(true);
+        this.dispose();
+        }
     }
      
     void getData(){
@@ -116,6 +125,7 @@ public class Delete extends javax.swing.JFrame {
         getContentPane().add(Frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 580, 360));
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked

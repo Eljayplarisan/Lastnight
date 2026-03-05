@@ -16,6 +16,13 @@ public class Admin extends javax.swing.JFrame {
     public Admin() {
         initComponents();
         loadUserProfile();
+        
+        if (!Session.isLoggedIn()) {
+        JOptionPane.showMessageDialog(this, "You must login first!");
+        login log = new login();
+        log.setVisible(true);
+        this.dispose();
+        }
     }
     
     

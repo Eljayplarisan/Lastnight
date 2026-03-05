@@ -5,7 +5,10 @@
  */
 package User;
 
+import Main.login;
+import config.Session;
 import config.config;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -17,6 +20,13 @@ public class brrw_bks extends javax.swing.JFrame {
     public brrw_bks() {
         initComponents();
         getData();
+        
+        if (!Session.isLoggedIn()) {
+        JOptionPane.showMessageDialog(this, "You must login first!");
+        login log = new login();
+        log.setVisible(true);
+        this.dispose();
+        }
     }
     
     void getData(){
@@ -92,6 +102,7 @@ public class brrw_bks extends javax.swing.JFrame {
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 360));
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void borrowMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_borrowMouseClicked

@@ -1,10 +1,12 @@
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * and open the template in the editor.9
  */
 package Admin;
 
+import Main.login;
+import config.Session;
 import config.config;
 import javax.swing.JOptionPane;
 
@@ -19,6 +21,13 @@ public class AddUser extends javax.swing.JFrame {
      */
     public AddUser() {
         initComponents();
+        
+        if (!Session.isLoggedIn()) {
+        JOptionPane.showMessageDialog(this, "You must login first!");
+        login log = new login();
+        log.setVisible(true);
+        this.dispose();
+        }
     }
 
     /**
@@ -143,6 +152,7 @@ public class AddUser extends javax.swing.JFrame {
         getContentPane().add(frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 360));
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void fnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fnameActionPerformed

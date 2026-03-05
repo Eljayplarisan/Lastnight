@@ -5,6 +5,8 @@
  */
 package User;
 
+import Main.login;
+import config.Session;
 import config.config;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -24,6 +26,12 @@ public class processbrrw extends javax.swing.JFrame {
     public processbrrw() {
         initComponents();
         getData();
+        if (!Session.isLoggedIn()) {
+        JOptionPane.showMessageDialog(this, "You must login first!");
+        login log = new login();
+        log.setVisible(true);
+        this.dispose();
+        }
     }
     
     void getData(){
@@ -136,6 +144,7 @@ public class processbrrw extends javax.swing.JFrame {
         getContentPane().add(frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void IdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IdActionPerformed

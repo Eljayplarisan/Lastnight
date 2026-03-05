@@ -5,7 +5,10 @@
  */
 package Admin;
 
+import Main.login;
+import config.Session;
 import config.config;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -19,6 +22,13 @@ public class Viewbook extends javax.swing.JFrame {
     public Viewbook() {
         initComponents();
         getData();
+        
+        if (!Session.isLoggedIn()) {
+        JOptionPane.showMessageDialog(this, "You must login first!");
+        login log = new login();
+        log.setVisible(true);
+        this.dispose();
+        }
     }
     
      void getData(){
@@ -71,6 +81,7 @@ public class Viewbook extends javax.swing.JFrame {
         getContentPane().add(frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 360));
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void backMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_backMouseClicked
