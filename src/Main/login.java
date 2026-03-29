@@ -2,6 +2,7 @@
 package Main;
 
 import Admin.Admin;
+import Staff.Staff;
 import User.userDashboard;
 import config.Session;
 import config.config;
@@ -150,6 +151,19 @@ public class login extends javax.swing.JFrame {
         this.dispose();
 
     }
+    // ✅ STAFF APPROVED
+    else if (con.authenticate(sql, email, password, "Staff", "Approve")) {
+
+        Session.setUsername(getUsernameByEmail(email));
+
+        JOptionPane.showMessageDialog(this, "Login Staff Success!");
+
+        Staff st = new Staff();
+        st.setLocationRelativeTo(null);   // Center next frame
+        st.setVisible(true);
+        this.dispose();
+
+    }
     // ✅ USER APPROVED
     else if (con.authenticate(sql, email, password, "User", "Approve")) {
 
@@ -165,7 +179,8 @@ public class login extends javax.swing.JFrame {
     }
     // ✅ PENDING ACCOUNT
     else if (con.authenticate(sql, email, password, "Admin", "Pending") ||
-             con.authenticate(sql, email, password, "User", "Pending")) {
+             con.authenticate(sql, email, password, "User", "Pending") ||
+             con.authenticate(sql, email, password, "Staff", "Pending")) {
 
         JOptionPane.showMessageDialog(this, 
             "Your account is still Pending. Please wait for Admin approval.");

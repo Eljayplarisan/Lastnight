@@ -47,10 +47,10 @@ public class AddUser extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        role = new javax.swing.JTextField();
         regBTn = new javax.swing.JButton();
         back = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
+        role = new javax.swing.JComboBox<>();
         frame = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -108,19 +108,6 @@ public class AddUser extends javax.swing.JFrame {
         jLabel5.setText("Name:");
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 80, -1, -1));
 
-        role.setToolTipText("");
-        role.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                roleMouseClicked(evt);
-            }
-        });
-        role.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                roleActionPerformed(evt);
-            }
-        });
-        getContentPane().add(role, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 250, 130, 30));
-
         regBTn.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
         regBTn.setText("Add User");
         regBTn.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -148,8 +135,11 @@ public class AddUser extends javax.swing.JFrame {
         jLabel7.setText("Password:");
         getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 150, -1, -1));
 
+        role.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "User", "Staff" }));
+        getContentPane().add(role, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 250, 90, -1));
+
         frame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/nn.jpg"))); // NOI18N
-        getContentPane().add(frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 360));
+        getContentPane().add(frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 540, 360));
 
         pack();
         setLocationRelativeTo(null);
@@ -200,7 +190,7 @@ public class AddUser extends javax.swing.JFrame {
                 userEmail,
                 userPassword,
                 "Admin",          // Role
-                "Approved"        // Status
+                "Approve"        // Status
             );
 
             // 3️⃣ Add User
@@ -229,14 +219,6 @@ public class AddUser extends javax.swing.JFrame {
        ad.setVisible(true);
        this.dispose();// TODO add your handling code here:
     }//GEN-LAST:event_backMouseClicked
-
-    private void roleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roleActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_roleActionPerformed
-
-    private void roleMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_roleMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_roleMouseClicked
 
     /**
      * @param args the command line arguments
@@ -285,7 +267,7 @@ public class AddUser extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JButton regBTn;
-    private javax.swing.JTextField role;
+    private javax.swing.JComboBox<String> role;
     private javax.swing.JTextField uname;
     // End of variables declaration//GEN-END:variables
 }

@@ -37,7 +37,7 @@ public class Admin extends javax.swing.JFrame {
              if (rs.next()) {
                 LBName.setText(rs.getString("u_fname"));
                 LBEmail.setText(rs.getString("u_email"));
-                LBRole.setText(rs.getString("u_role"));
+               
             } else {
                 JOptionPane.showMessageDialog(this, "User not found!");
             }
@@ -54,11 +54,9 @@ public class Admin extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         lbEmail = new javax.swing.JLabel();
-        lbRole = new javax.swing.JLabel();
         lbName = new javax.swing.JLabel();
         profile = new javax.swing.JLabel();
         LBEmail = new javax.swing.JLabel();
-        LBRole = new javax.swing.JLabel();
         LBName = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
@@ -93,11 +91,6 @@ public class Admin extends javax.swing.JFrame {
         lbEmail.setText("Email:");
         jPanel7.add(lbEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 140, -1, 60));
 
-        lbRole.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        lbRole.setForeground(new java.awt.Color(255, 255, 255));
-        lbRole.setText("Role:");
-        jPanel7.add(lbRole, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 180, -1, 60));
-
         lbName.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         lbName.setForeground(new java.awt.Color(255, 255, 255));
         lbName.setText("Name:");
@@ -109,10 +102,6 @@ public class Admin extends javax.swing.JFrame {
         LBEmail.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         LBEmail.setForeground(new java.awt.Color(255, 255, 255));
         jPanel7.add(LBEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 160, 120, 30));
-
-        LBRole.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        LBRole.setForeground(new java.awt.Color(255, 255, 255));
-        jPanel7.add(LBRole, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 200, 120, 30));
 
         LBName.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         LBName.setForeground(new java.awt.Color(255, 255, 255));
@@ -384,7 +373,6 @@ public class Admin extends javax.swing.JFrame {
     private javax.swing.JLabel Delte;
     private javax.swing.JLabel LBEmail;
     private javax.swing.JLabel LBName;
-    private javax.swing.JLabel LBRole;
     private javax.swing.JPanel User;
     private javax.swing.JPanel addbooks;
     private javax.swing.JLabel background;
@@ -399,7 +387,6 @@ public class Admin extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JLabel lbEmail;
     private javax.swing.JLabel lbName;
-    private javax.swing.JLabel lbRole;
     private javax.swing.JPanel list;
     private javax.swing.JLabel profile;
     private javax.swing.JLabel transac;

@@ -23,13 +23,12 @@ public class register extends javax.swing.JFrame {
         email = new javax.swing.JTextField();
         uname = new javax.swing.JTextField();
         regBTn = new javax.swing.JButton();
-        role = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         back = new javax.swing.JLabel();
         Password = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
+        role = new javax.swing.JComboBox<>();
         pic = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setFocusCycleRoot(false);
@@ -89,14 +88,6 @@ public class register extends javax.swing.JFrame {
         });
         getContentPane().add(regBTn, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 290, -1, 30));
 
-        role.setToolTipText("");
-        role.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                roleActionPerformed(evt);
-            }
-        });
-        getContentPane().add(role, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 250, 130, 30));
-
         jLabel7.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("Email:");
@@ -123,11 +114,11 @@ public class register extends javax.swing.JFrame {
         jLabel8.setText("Role:");
         getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 220, -1, -1));
 
+        role.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "User", "Staff" }));
+        getContentPane().add(role, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 250, 90, -1));
+
         pic.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/nn.jpg"))); // NOI18N
         getContentPane().add(pic, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 540, 360));
-
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 360));
 
         pack();
         setLocationRelativeTo(null);
@@ -135,56 +126,44 @@ public class register extends javax.swing.JFrame {
 
     private void regBTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regBTnActionPerformed
         
- 
-     try {
-    config con = new config();
-    String sql = "INSERT INTO tbl_data (u_fname, u_uname, u_email, u_password, u_role, u_status) VALUES (?, ?, ?, ?, ?, ?)";
+        String firstName = fname.getText().trim();
+        String username = uname.getText().trim();
+        String userEmail = email.getText().trim();
+        String userPassword = Password.getText().trim();
+        String selectedRole = role.getSelectedItem().toString();
 
-    // 2️⃣ Get input safely from the form
-    String firstName = fname.getText().trim();
-    String username = uname.getText().trim();
-    String userEmail = email.getText().trim();
-    String userPassword;
+        if (firstName.isEmpty() || username.isEmpty() || userEmail.isEmpty() || userPassword.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields.");
+            return;
+        }
 
-    if (Password instanceof javax.swing.JPasswordField) {
-        userPassword = new String(((javax.swing.JPasswordField) Password).getPassword());
-    } else {
-        userPassword = Password.getText().trim();
-    }
+        String status = "Pending";
 
-    // 3️⃣ Add Admin
-    con.addRecord(sql,
-        firstName,
-        username,
-        userEmail,
-        userPassword,
-        "Admin",   // Role
-        "Approved" // Status
-    );
+        try {
+            config con = new config();
+            String sql = "INSERT INTO tbl_data (u_fname, u_uname, u_email, u_password, u_role, u_status) VALUES (?, ?, ?, ?, ?, ?)";
 
-    // 4️⃣ Add User
-    con.addRecord(sql,
-        firstName,
-        username,
-        userEmail,
-        userPassword,
-        "User",    // Role
-        "Pending"  // Status
-    );
+            con.addRecord(sql,
+                firstName,
+                username,
+                userEmail,
+                userPassword,
+                selectedRole,
+                status
+            );
 
-    // 5️⃣ Show success message — will appear **in front of the register form**
-    JOptionPane.showMessageDialog(this, "New User added successfully!");
+            JOptionPane.showMessageDialog(this, "New " + selectedRole + " added successfully!");
 
-    // 6️⃣ Clear the form fields
-    fname.setText("");
-    uname.setText("");
-    email.setText("");
-    Password.setText("");
+            fname.setText("");
+            uname.setText("");
+            email.setText("");
+            Password.setText("");
+            role.setSelectedIndex(0);
 
-} catch (Exception ex) {
-    JOptionPane.showMessageDialog(this, "Error adding user: " + ex.getMessage());
-    ex.printStackTrace();
-}
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error adding user: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }//GEN-LAST:event_regBTnActionPerformed
 
     private void fnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fnameActionPerformed
@@ -202,10 +181,6 @@ public class register extends javax.swing.JFrame {
     private void regBTnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_regBTnMouseClicked
         // TODO add your handling code here:
     }//GEN-LAST:event_regBTnMouseClicked
-
-    private void roleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roleActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_roleActionPerformed
 
     private void backMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_backMouseClicked
         login log = new login();
@@ -259,10 +234,9 @@ public class register extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel pic;
     private javax.swing.JButton regBTn;
-    private javax.swing.JTextField role;
+    private javax.swing.JComboBox<String> role;
     private javax.swing.JTextField uname;
     // End of variables declaration//GEN-END:variables
 }
