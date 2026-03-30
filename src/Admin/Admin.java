@@ -179,13 +179,13 @@ public class Admin extends javax.swing.JFrame {
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel7.setText("Dashboard");
+        jLabel7.setText("Approve");
         jLabel7.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel7MouseClicked(evt);
             }
         });
-        dashboard.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, -1, 100, 30));
+        dashboard.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, -1, 90, 30));
 
         jPanel7.add(dashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 60, 130, 30));
 

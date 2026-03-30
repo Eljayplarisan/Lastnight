@@ -5,8 +5,15 @@
  */
 package Staff;
 
+import Admin.Books;
+import Admin.Delete;
+import Admin.Viewbook;
 import Main.login;
 import config.Session;
+import config.config;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import javax.swing.JOptionPane;
 
 /**
@@ -28,6 +35,44 @@ public class Staff extends javax.swing.JFrame {
         this.dispose();
         }
     }
+    
+    public void Staff() {
+    initComponents();
+    loadUserProfile();  // ADD THIS LINE
+    
+    if (!Session.isLoggedIn()) {
+        JOptionPane.showMessageDialog(this, "You must login first!");
+        login log = new login();
+        log.setVisible(true);
+        this.dispose();
+    }
+}
+    
+    private void loadUserProfile() {
+    String sql = "SELECT u_fname, u_email, u_role FROM tbl_data WHERE u_uname = ?";
+    try (Connection conn = config.connectDB();
+         PreparedStatement pst = conn.prepareStatement(sql)) {
+
+        pst.setString(1, Session.getUsername());
+        ResultSet rs = pst.executeQuery();
+        
+        if (rs.next()) {
+            String fname = rs.getString("u_fname");
+            String email = rs.getString("u_email");
+            
+            LBName.setText(fname != null ? fname : "N/A");
+            LBEmail.setText(email != null ? email : "N/A");
+            
+            System.out.println("Profile loaded: " + fname + " | " + email); // Debug
+        } else {
+            JOptionPane.showMessageDialog(this, "User not found!");
+        }
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        e.printStackTrace(); // Check console for errors
+    }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -40,6 +85,19 @@ public class Staff extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         dashb = new javax.swing.JLabel();
+        profile = new javax.swing.JLabel();
+        lbName = new javax.swing.JLabel();
+        lbEmail = new javax.swing.JLabel();
+        LBName = new javax.swing.JLabel();
+        LBEmail = new javax.swing.JLabel();
+        addbooks = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        del = new javax.swing.JPanel();
+        Delte = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        view = new javax.swing.JPanel();
+        book = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -49,8 +107,100 @@ public class Staff extends javax.swing.JFrame {
 
         dashb.setFont(new java.awt.Font("Tahoma", 1, 25)); // NOI18N
         dashb.setForeground(new java.awt.Color(255, 255, 255));
-        dashb.setText("StaffDashboard");
+        dashb.setText("UserDashboard");
         jPanel1.add(dashb, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 10, -1, -1));
+
+        profile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/profile.png"))); // NOI18N
+        jPanel1.add(profile, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 100, 70));
+
+        lbName.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        lbName.setForeground(new java.awt.Color(255, 255, 255));
+        lbName.setText("Name:");
+        jPanel1.add(lbName, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, -1, 40));
+
+        lbEmail.setBackground(new java.awt.Color(255, 255, 255));
+        lbEmail.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        lbEmail.setForeground(new java.awt.Color(255, 255, 255));
+        lbEmail.setText("Email:");
+        jPanel1.add(lbEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 140, -1, 60));
+
+        LBName.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        LBName.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel1.add(LBName, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 120, 100, 30));
+
+        LBEmail.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        LBEmail.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel1.add(LBEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 160, 120, 30));
+
+        addbooks.setBackground(new java.awt.Color(73, 105, 164));
+        addbooks.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        addbooks.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                addbooksMouseClicked(evt);
+            }
+        });
+        addbooks.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("Add Books");
+        addbooks.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 4, 90, 20));
+
+        jPanel1.add(addbooks, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 60, 130, 30));
+
+        del.setBackground(new java.awt.Color(73, 105, 164));
+        del.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        del.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                delMouseClicked(evt);
+            }
+        });
+        del.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        Delte.setBackground(new java.awt.Color(191, 153, 114));
+        Delte.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
+        Delte.setForeground(new java.awt.Color(255, 255, 255));
+        Delte.setText("Delete");
+        Delte.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                DelteMouseClicked(evt);
+            }
+        });
+        del.add(Delte, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 0, 60, 30));
+
+        jPanel1.add(del, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 140, 130, 30));
+
+        jPanel6.setBackground(new java.awt.Color(73, 105, 164));
+        jPanel6.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel6.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jPanel6MouseClicked(evt);
+            }
+        });
+        jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel5.setText(" Logout");
+        jPanel6.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, -1, 70, 30));
+
+        jPanel1.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 310, 120, 30));
+
+        view.setBackground(new java.awt.Color(73, 105, 164));
+        view.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        view.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        book.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
+        book.setForeground(new java.awt.Color(255, 255, 255));
+        book.setText("View Books");
+        book.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                bookMouseClicked(evt);
+            }
+        });
+        view.add(book, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, -1, 90, 30));
+
+        jPanel1.add(view, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 100, 130, 30));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/fan.jpg"))); // NOI18N
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
@@ -60,6 +210,34 @@ public class Staff extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void addbooksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addbooksMouseClicked
+        Books bk = new Books();
+        bk.setVisible(true);
+        this.dispose();// TODO add your handling code here:
+    }//GEN-LAST:event_addbooksMouseClicked
+
+    private void bookMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bookMouseClicked
+        Viewbook vb = new Viewbook();
+        vb.setVisible(true);
+        this.dispose();// TODO add your handling code here:
+    }//GEN-LAST:event_bookMouseClicked
+
+    private void DelteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DelteMouseClicked
+        Delete del = new Delete();
+        del.setVisible(true);
+        this.dispose();// TODO add your handling code here:
+    }//GEN-LAST:event_DelteMouseClicked
+
+    private void delMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_delMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_delMouseClicked
+
+    private void jPanel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel6MouseClicked
+        login log = new login();
+        log.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jPanel6MouseClicked
 
     /**
      * @param args the command line arguments
@@ -97,8 +275,21 @@ public class Staff extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Delte;
+    private javax.swing.JLabel LBEmail;
+    private javax.swing.JLabel LBName;
+    private javax.swing.JPanel addbooks;
+    private javax.swing.JLabel book;
     private javax.swing.JLabel dashb;
+    private javax.swing.JPanel del;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JLabel lbEmail;
+    private javax.swing.JLabel lbName;
+    private javax.swing.JLabel profile;
+    private javax.swing.JPanel view;
     // End of variables declaration//GEN-END:variables
 }
