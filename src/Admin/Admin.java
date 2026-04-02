@@ -7,6 +7,7 @@ import config.Session;
 import config.config;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -66,7 +67,6 @@ public class Admin extends javax.swing.JFrame {
     }
 
     private void styleActionButton(JPanel panel, JLabel label) {
-        final Color baseColor = panel.getBackground();
         panel.setBorder(BorderFactory.createEmptyBorder());
         panel.setOpaque(false);
         panel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -83,42 +83,61 @@ public class Admin extends javax.swing.JFrame {
         panel.add(backgroundLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
         panel.setComponentZOrder(backgroundLabel, panel.getComponentCount() - 1);
         panel.setComponentZOrder(label, 0);
+        label.setBounds(0, 0, Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()));
 
         panel.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentResized(java.awt.event.ComponentEvent evt) {
                 backgroundLabel.setBounds(0, 0, panel.getWidth(), panel.getHeight());
-                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, false)));
+                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), false)));
+                label.setBounds(0, 0, panel.getWidth(), panel.getHeight());
+                fitLabelText(label, panel.getWidth() - 16);
             }
         });
 
         panel.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, true)));
+                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), true)));
             }
 
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, false)));
+                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), false)));
             }
         });
         
         backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(
-                Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()), baseColor, false
+                Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()), false
         )));
+        fitLabelText(label, Math.max(1, panel.getWidth() - 16));
     }
 
-    private BufferedImage createGlossyButtonImage(int width, int height, Color baseColor, boolean hover) {
+    private void fitLabelText(JLabel label, int maxWidth) {
+        Font baseFont = label.getFont();
+        int targetSize = baseFont.getSize();
+        while (targetSize > 11) {
+            Font testFont = new Font(baseFont.getName(), baseFont.getStyle(), targetSize);
+            int textWidth = label.getFontMetrics(testFont).stringWidth(label.getText());
+            if (textWidth <= maxWidth) {
+                label.setFont(testFont);
+                return;
+            }
+            targetSize--;
+        }
+        label.setFont(new Font(baseFont.getName(), baseFont.getStyle(), 11));
+    }
+
+    private BufferedImage createGlossyButtonImage(int width, int height, boolean hover) {
         int w = Math.max(width, 1);
         int h = Math.max(height, 1);
         BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = image.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        Color outer = hover ? adjustColor(baseColor, 110) : adjustColor(baseColor, 80);
-        Color top = hover ? adjustColor(baseColor, 45) : adjustColor(baseColor, 25);
-        Color bottom = hover ? adjustColor(baseColor, -35) : adjustColor(baseColor, -20);
+        Color outer = hover ? new Color(227, 231, 239) : new Color(210, 214, 224);
+        Color top = hover ? new Color(187, 74, 255) : new Color(164, 43, 248);
+        Color bottom = hover ? new Color(104, 0, 232) : new Color(91, 0, 215);
         Color shineTop = new Color(255, 255, 255, hover ? 180 : 165);
         Color shineBottom = new Color(255, 255, 255, 20);
 
@@ -136,13 +155,6 @@ public class Admin extends javax.swing.JFrame {
         g2.drawRoundRect(1, 1, w - 3, h - 3, arc, arc);
         g2.dispose();
         return image;
-    }
-
-    private Color adjustColor(Color color, int amount) {
-        int red = Math.max(0, Math.min(255, color.getRed() + amount));
-        int green = Math.max(0, Math.min(255, color.getGreen() + amount));
-        int blue = Math.max(0, Math.min(255, color.getBlue() + amount));
-        return new Color(red, green, blue);
     }
 
     @SuppressWarnings("unchecked")
