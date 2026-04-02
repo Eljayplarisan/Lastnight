@@ -9,16 +9,18 @@ import Main.login;
 import config.Session;
 import config.config;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FlowLayout;
+import java.awt.GradientPaint;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.BasicStroke;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import javax.imageio.ImageIO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -46,10 +48,14 @@ public class Viewbook extends javax.swing.JFrame {
         ensureBooksImageColumn();
         styleActionButton(deletePanel, deleteLabel, new Color(30, 95, 95));
         booksGrid.setOpaque(false);
-        booksGrid.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        booksGrid.setLayout(new GridLayout(0, 2, 18, 18));
+        booksGrid.setBackground(new Color(10, 10, 14));
+        booksGrid.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        booksGrid.setLayout(new FlowLayout(FlowLayout.LEFT, 12, 14));
         galleryScroll.getViewport().setOpaque(false);
         galleryScroll.setOpaque(false);
+        galleryScroll.getViewport().setBackground(new Color(10, 10, 14));
+        galleryScroll.getVerticalScrollBar().setUnitIncrement(14);
+        detailPanel.setOpaque(true);
         loadBooks();
 
         if (!Session.isLoggedIn()) {
@@ -74,7 +80,7 @@ public class Viewbook extends javax.swing.JFrame {
         selectedBook = null;
         selectedBookId = null;
         clearBookDetails();
-        showGalleryView();
+        detailPanel.setVisible(true);
 
         try (Connection conn = config.connectDB();
              PreparedStatement pst = conn.prepareStatement(
@@ -96,6 +102,9 @@ public class Viewbook extends javax.swing.JFrame {
 
             booksGrid.revalidate();
             booksGrid.repaint();
+            if (!books.isEmpty()) {
+                showBookDetails(books.get(0));
+            }
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Unable to load books: " + e.getMessage());
@@ -118,18 +127,16 @@ public class Viewbook extends javax.swing.JFrame {
         detailAuthor = new javax.swing.JLabel();
         detailPublisher = new javax.swing.JLabel();
         detailYear = new javax.swing.JLabel();
-        detailBackPanel = new javax.swing.JPanel();
-        detailBackLabel = new javax.swing.JLabel();
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        booksGrid.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        booksGrid.setLayout(new java.awt.GridLayout(1, 0, 18, 18));
+        booksGrid.setBackground(new java.awt.Color(10, 10, 14));
+        booksGrid.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        booksGrid.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 12, 14));
         galleryScroll.setViewportView(booksGrid);
 
         galleryScroll.setBorder(null);
-        getContentPane().add(galleryScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 12, 360, 336));
+        getContentPane().add(galleryScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(176, 18, 364, 326));
 
         deletePanel.setBackground(new java.awt.Color(30, 95, 95));
         deletePanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -150,7 +157,7 @@ public class Viewbook extends javax.swing.JFrame {
         });
         deletePanel.add(deleteLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 30));
 
-        getContentPane().add(deletePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(18, 228, 120, 30));
+        getContentPane().add(deletePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 270, 120, 30));
 
         back.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png"))); // NOI18N
         back.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -160,55 +167,34 @@ public class Viewbook extends javax.swing.JFrame {
         });
         getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 300, -1, 50));
 
-        detailPanel.setBackground(new java.awt.Color(236, 239, 255));
-        detailPanel.setBorder(BorderFactory.createLineBorder(new Color(208, 213, 236), 1));
+        detailPanel.setBackground(new java.awt.Color(18, 20, 28));
+        detailPanel.setBorder(null);
         detailPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         detailImage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        detailPanel.add(detailImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(18, 12, 158, 170));
+        detailPanel.add(detailImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 10, 164, 108));
 
-        detailTitle.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        detailTitle.setForeground(new java.awt.Color(45, 50, 70));
+        detailTitle.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        detailTitle.setForeground(new java.awt.Color(245, 247, 255));
         detailTitle.setText("Title : ");
-        detailPanel.add(detailTitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 188, 180, 20));
+        detailPanel.add(detailTitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(14, 132, 175, 22));
 
-        detailAuthor.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        detailAuthor.setForeground(new java.awt.Color(65, 70, 92));
+        detailAuthor.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
+        detailAuthor.setForeground(new java.awt.Color(206, 212, 232));
         detailAuthor.setText("Author : ");
-        detailPanel.add(detailAuthor, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 212, 180, 20));
+        detailPanel.add(detailAuthor, new org.netbeans.lib.awtextra.AbsoluteConstraints(14, 164, 175, 22));
 
-        detailPublisher.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        detailPublisher.setForeground(new java.awt.Color(65, 70, 92));
+        detailPublisher.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
+        detailPublisher.setForeground(new java.awt.Color(206, 212, 232));
         detailPublisher.setText("Publisher : ");
-        detailPanel.add(detailPublisher, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 236, 180, 20));
+        detailPanel.add(detailPublisher, new org.netbeans.lib.awtextra.AbsoluteConstraints(14, 196, 175, 22));
 
-        detailYear.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        detailYear.setForeground(new java.awt.Color(65, 70, 92));
+        detailYear.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
+        detailYear.setForeground(new java.awt.Color(206, 212, 232));
         detailYear.setText("Year Publish : ");
-        detailPanel.add(detailYear, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 260, 180, 20));
+        detailPanel.add(detailYear, new org.netbeans.lib.awtextra.AbsoluteConstraints(14, 228, 175, 22));
 
         getContentPane().add(detailPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 195, 290));
-
-        detailBackPanel.setBackground(new java.awt.Color(30, 95, 95));
-        detailBackPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        detailBackPanel.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                detailBackPanelMouseClicked(evt);
-            }
-        });
-        detailBackPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        detailBackLabel.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
-        detailBackLabel.setForeground(new java.awt.Color(255, 255, 255));
-        detailBackLabel.setText("Back");
-        detailBackLabel.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                detailBackLabelMouseClicked(evt);
-            }
-        });
-        detailBackPanel.add(detailBackLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 90, 30));
-
-        getContentPane().add(detailBackPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(58, 318, 90, 30));
 
         frame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/ima.jpg"))); // NOI18N
         getContentPane().add(frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 360));
@@ -230,14 +216,6 @@ public class Viewbook extends javax.swing.JFrame {
        ua.setVisible(true);
        this.dispose();
     }//GEN-LAST:event_backMouseClicked
-
-    private void detailBackPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_detailBackPanelMouseClicked
-        showGalleryView();
-    }//GEN-LAST:event_detailBackPanelMouseClicked
-
-    private void detailBackLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_detailBackLabelMouseClicked
-        showGalleryView();
-    }//GEN-LAST:event_detailBackLabelMouseClicked
 
     /**
      * @param args the command line arguments
@@ -280,8 +258,6 @@ public class Viewbook extends javax.swing.JFrame {
     private javax.swing.JLabel deleteLabel;
     private javax.swing.JPanel deletePanel;
     private javax.swing.JLabel detailAuthor;
-    private javax.swing.JLabel detailBackLabel;
-    private javax.swing.JPanel detailBackPanel;
     private javax.swing.JLabel detailImage;
     private javax.swing.JPanel detailPanel;
     private javax.swing.JLabel detailPublisher;
@@ -294,22 +270,22 @@ public class Viewbook extends javax.swing.JFrame {
     private JPanel createBookCard(BookItem item) {
         JPanel card = new JPanel();
         card.setOpaque(true);
-        card.setBackground(new Color(230, 234, 252));
-        card.setBorder(BorderFactory.createEmptyBorder());
-        card.setPreferredSize(new Dimension(125, 148));
+        card.setBackground(new Color(12, 12, 16));
+        card.setBorder(BorderFactory.createEmptyBorder(5, 5, 7, 5));
+        card.setPreferredSize(new Dimension(92, 150));
         card.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         card.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         JLabel imageLabel = new JLabel();
         imageLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        imageLabel.setIcon(loadScaledImage(item.imagePath, 96, 92));
-        card.add(imageLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(14, 10, 96, 92));
+        imageLabel.setIcon(loadScaledImage(item.imagePath, 80, 108));
+        card.add(imageLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 4, 80, 108));
 
         JLabel titleLabel = new JLabel("<html><center>" + safeText(item.title) + "</center></html>");
-        titleLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
-        titleLabel.setForeground(new Color(54, 58, 78));
+        titleLabel.setFont(new Font("Tahoma", Font.BOLD, 10));
+        titleLabel.setForeground(new Color(255, 196, 66));
         titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        card.add(titleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 105, 22));
+        card.add(titleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(7, 116, 78, 24));
 
         java.awt.event.MouseAdapter clickHandler = new java.awt.event.MouseAdapter() {
             @Override
@@ -327,45 +303,28 @@ public class Viewbook extends javax.swing.JFrame {
     private void showBookDetails(BookItem item) {
         selectedBook = item;
         selectedBookId = item.id;
-        detailImage.setIcon(loadScaledImage(item.imagePath, 158, 170));
+        detailImage.setIcon(loadScaledImage(item.imagePath, 164, 108));
+        detailImage.setVisible(true);
         detailTitle.setText("Title : " + safeText(item.title));
         detailAuthor.setText("Author : " + safeText(item.author));
         detailPublisher.setText("Publisher : " + safeText(item.publisher));
         detailYear.setText("Year Publish : " + safeText(item.publishYear));
 
-        for (Component component : booksGrid.getComponents()) {
-            if (component instanceof JPanel) {
-                component.setBackground(new Color(232, 236, 255));
-            }
-        }
-
-        int index = books.indexOf(item);
-        if (index >= 0 && index < booksGrid.getComponentCount()) {
-            booksGrid.getComponent(index).setBackground(new Color(216, 223, 255));
-        }
-
-        galleryScroll.setVisible(false);
         detailPanel.setVisible(true);
-        detailBackPanel.setVisible(true);
     }
 
     private void clearBookDetails() {
         detailImage.setIcon(null);
-        detailTitle.setText("Title : ");
+        detailImage.setVisible(false);
+        detailTitle.setText("Title : Select a book");
         detailAuthor.setText("Author : ");
         detailPublisher.setText("Publisher : ");
         detailYear.setText("Year Publish : ");
     }
 
-    private void showGalleryView() {
-        galleryScroll.setVisible(true);
-        detailPanel.setVisible(false);
-        detailBackPanel.setVisible(false);
-    }
-
     private ImageIcon loadScaledImage(String imagePath, int width, int height) {
         if (imagePath == null || imagePath.trim().isEmpty()) {
-            return null;
+            return createPlaceholderIcon(width, height, "No Image");
         }
 
         File file = new File(imagePath);
@@ -373,25 +332,55 @@ public class Viewbook extends javax.swing.JFrame {
             file = new File(System.getProperty("user.dir"), imagePath);
         }
         if (!file.exists()) {
-            return null;
+            return createPlaceholderIcon(width, height, "No Image");
         }
 
-        ImageIcon raw = new ImageIcon(file.getAbsolutePath());
-        if (raw.getIconWidth() <= 0 || raw.getIconHeight() <= 0) {
-            return null;
+        try {
+            BufferedImage source = ImageIO.read(file);
+            if (source == null) {
+                ImageIcon raw = new ImageIcon(file.getAbsolutePath());
+                if (raw.getIconWidth() <= 0 || raw.getIconHeight() <= 0) {
+                    return null;
+                }
+                source = new BufferedImage(raw.getIconWidth(), raw.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+                Graphics2D sourceGraphics = source.createGraphics();
+                sourceGraphics.drawImage(raw.getImage(), 0, 0, null);
+                sourceGraphics.dispose();
+            }
+
+            double scale = Math.min((double) width / source.getWidth(), (double) height / source.getHeight());
+            int drawWidth = Math.max(1, (int) Math.round(source.getWidth() * scale));
+            int drawHeight = Math.max(1, (int) Math.round(source.getHeight() * scale));
+            Image scaled = source.getScaledInstance(drawWidth, drawHeight, Image.SCALE_SMOOTH);
+
+            BufferedImage canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = canvas.createGraphics();
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2.drawImage(scaled, (width - drawWidth) / 2, (height - drawHeight) / 2, null);
+            g2.dispose();
+            return new ImageIcon(canvas);
+        } catch (Exception e) {
+            return createPlaceholderIcon(width, height, "No Image");
         }
+    }
 
-        double scale = Math.min((double) width / raw.getIconWidth(), (double) height / raw.getIconHeight());
-        int drawWidth = Math.max(1, (int) Math.round(raw.getIconWidth() * scale));
-        int drawHeight = Math.max(1, (int) Math.round(raw.getIconHeight() * scale));
-        Image scaled = raw.getImage().getScaledInstance(drawWidth, drawHeight, Image.SCALE_SMOOTH);
-
-        BufferedImage canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = canvas.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2.drawImage(scaled, (width - drawWidth) / 2, (height - drawHeight) / 2, null);
+    private ImageIcon createPlaceholderIcon(int width, int height, String text) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setPaint(new GradientPaint(0, 0, new Color(34, 36, 46), 0, height, new Color(18, 20, 28)));
+        g2.fillRoundRect(0, 0, width - 1, height - 1, 18, 18);
+        g2.setColor(new Color(82, 90, 122));
+        g2.setStroke(new BasicStroke(2f));
+        g2.drawRoundRect(1, 1, width - 3, height - 3, 18, 18);
+        g2.setColor(new Color(214, 220, 240));
+        g2.setFont(new Font("Tahoma", Font.BOLD, Math.max(11, Math.min(15, width / 8))));
+        java.awt.FontMetrics fm = g2.getFontMetrics();
+        int textX = (width - fm.stringWidth(text)) / 2;
+        int textY = (height + fm.getAscent()) / 2 - 4;
+        g2.drawString(text, Math.max(8, textX), textY);
         g2.dispose();
-        return new ImageIcon(canvas);
+        return new ImageIcon(image);
     }
 
     private String safeText(String text) {
