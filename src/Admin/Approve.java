@@ -221,7 +221,7 @@ public class Approve extends javax.swing.JFrame {
     }
 
     private void loadTableData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        getData();
     }
 
     private void styleActionButton(JPanel panel, JLabel label, Color baseColor) {

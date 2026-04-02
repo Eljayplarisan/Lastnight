@@ -201,9 +201,9 @@ public class userDashboard extends javax.swing.JFrame {
                 bookMouseClicked(evt);
             }
         });
-        books.add(book, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 135, 34));
+        books.add(book, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 110, 30));
 
-        jPanel2.add(books, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 90, 135, 34));
+        jPanel2.add(books, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 90, 120, 30));
 
         log.setBackground(new java.awt.Color(73, 105, 164));
         log.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -217,14 +217,14 @@ public class userDashboard extends javax.swing.JFrame {
                 LogoutMouseClicked(evt);
             }
         });
-        log.add(Logout, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 135, 34));
+        log.add(Logout, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 0, 70, 30));
 
-        jPanel2.add(log, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 310, 135, 34));
+        jPanel2.add(log, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 310, 120, 30));
 
         Text.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         Text.setForeground(new java.awt.Color(255, 255, 255));
-        Text.setText("UserDashboard");
-        jPanel2.add(Text, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 10, 190, 40));
+        Text.setText("User_Dashboard");
+        jPanel2.add(Text, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 10, 200, 40));
 
         books1.setBackground(new java.awt.Color(73, 105, 164));
         books1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -243,9 +243,9 @@ public class userDashboard extends javax.swing.JFrame {
                 book1MouseClicked(evt);
             }
         });
-        books1.add(book1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 135, 34));
+        books1.add(book1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, -1, 30));
 
-        jPanel2.add(books1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 130, 135, 34));
+        jPanel2.add(books1, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 130, 120, 30));
 
         profile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/profile.png"))); // NOI18N
         jPanel2.add(profile, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 100, 70));
@@ -283,7 +283,9 @@ public class userDashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_books1MouseClicked
 
     private void book1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_book1MouseClicked
-        // TODO add your handling code here:
+        Return rn = new Return();
+        rn.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_book1MouseClicked
 
     private void LogoutMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LogoutMouseClicked

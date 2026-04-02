@@ -201,7 +201,7 @@ public class Staff extends javax.swing.JFrame {
 
         dashb.setFont(new java.awt.Font("Tahoma", 1, 25)); // NOI18N
         dashb.setForeground(new java.awt.Color(255, 255, 255));
-        dashb.setText("UserDashboard");
+        dashb.setText("Staff_Dashboard");
         jPanel1.add(dashb, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 10, -1, -1));
 
         profile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/profile.png"))); // NOI18N

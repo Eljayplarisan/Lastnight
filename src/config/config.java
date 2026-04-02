@@ -20,7 +20,7 @@ public class config {
     }
 
     public static Connection getConnection() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return connectDB();
     }
 
     public void addRecord(String sql, Object... values) {

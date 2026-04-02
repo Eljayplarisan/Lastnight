@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Staff;
+package User;
 
 import Main.login;
 import config.Session;
@@ -29,15 +29,14 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class viewbooks extends javax.swing.JFrame {
+public class Return extends javax.swing.JFrame {
 
     private final List<BookItem> books = new ArrayList<>();
     private Integer selectedBookId;
 
-    public viewbooks() {
+    public Return() {
         initComponents();
-        getContentPane().setComponentZOrder(frame, getContentPane().getComponentCount() - 1);
-        styleActionButton(deletePanel, deleteLabel, new Color(30, 95, 95));
+        styleActionButton(ReturnPanel, RETURN, new Color(30, 95, 95));
         booksGrid.setOpaque(true);
         booksGrid.setBackground(new Color(14, 14, 18));
         booksGrid.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -47,7 +46,8 @@ public class viewbooks extends javax.swing.JFrame {
         galleryScroll.getViewport().setOpaque(true);
         galleryScroll.getViewport().setBackground(new Color(14, 14, 18));
         galleryScroll.getVerticalScrollBar().setUnitIncrement(16);
-        loadBooks();
+        getContentPane().setComponentZOrder(frame, getContentPane().getComponentCount() - 1);
+        loadBorrowedBooks();
 
         if (!Session.isLoggedIn()) {
             JOptionPane.showMessageDialog(this, "You must login first!");
@@ -57,27 +57,37 @@ public class viewbooks extends javax.swing.JFrame {
         }
     }
 
-    private void loadBooks() {
+    private void loadBorrowedBooks() {
         books.clear();
         booksGrid.removeAll();
         selectedBookId = null;
 
+        String username = Session.getUsername();
+
         try (Connection conn = config.connectDB();
              PreparedStatement pst = conn.prepareStatement(
-                     "SELECT b_id, b_title, b_author, b_publisher, b_publish, COALESCE(b_image, '') AS b_image FROM tbl_books ORDER BY b_id DESC");
-             ResultSet rs = pst.executeQuery()) {
+                     "SELECT b.b_id, b.b_title, b.b_author, b.b_publisher, b.b_publish, COALESCE(b.b_image, '') AS b_image, br.status " +
+                     "FROM tbl_books b " +
+                     "INNER JOIN tbl_borrower br ON br.book_id = b.b_id " +
+                     "WHERE br.U_name = ? AND COALESCE(br.status,'') = 'Borrowed' " +
+                     "ORDER BY b.b_id DESC")) {
 
-            while (rs.next()) {
-                BookItem item = new BookItem(
-                        rs.getInt("b_id"),
-                        rs.getString("b_title"),
-                        rs.getString("b_author"),
-                        rs.getString("b_publisher"),
-                        rs.getString("b_publish"),
-                        rs.getString("b_image")
-                );
-                books.add(item);
-                booksGrid.add(createBookCard(item));
+            pst.setString(1, username);
+
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    BookItem item = new BookItem(
+                            rs.getInt("b_id"),
+                            rs.getString("b_title"),
+                            rs.getString("b_author"),
+                            rs.getString("b_publisher"),
+                            rs.getString("b_publish"),
+                            rs.getString("b_image"),
+                            rs.getString("status")
+                    );
+                    books.add(item);
+                    booksGrid.add(createBookCard(item));
+                }
             }
 
             if (!books.isEmpty()) {
@@ -88,7 +98,7 @@ public class viewbooks extends javax.swing.JFrame {
             booksGrid.revalidate();
             booksGrid.repaint();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Unable to load books: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Unable to load borrowed books: " + e.getMessage());
         }
     }
 
@@ -98,8 +108,8 @@ public class viewbooks extends javax.swing.JFrame {
 
         galleryScroll = new javax.swing.JScrollPane();
         booksGrid = new javax.swing.JPanel();
-        deletePanel = new javax.swing.JPanel();
-        deleteLabel = new javax.swing.JLabel();
+        ReturnPanel = new javax.swing.JPanel();
+        RETURN = new javax.swing.JLabel();
         bck = new javax.swing.JLabel();
         frame = new javax.swing.JLabel();
 
@@ -108,35 +118,34 @@ public class viewbooks extends javax.swing.JFrame {
 
         booksGrid.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
         galleryScroll.setViewportView(booksGrid);
-
         getContentPane().add(galleryScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(156, 8, 384, 342));
 
-        deletePanel.setBackground(new java.awt.Color(30, 95, 95));
-        deletePanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        deletePanel.addMouseListener(new java.awt.event.MouseAdapter() {
+        ReturnPanel.setBackground(new java.awt.Color(30, 95, 95));
+        ReturnPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        ReturnPanel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                deleteSelectedBook();
+                returnSelectedBook();
             }
         });
-        deletePanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        ReturnPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        deleteLabel.setFont(new java.awt.Font("Tahoma", 1, 18));
-        deleteLabel.setForeground(new java.awt.Color(255, 255, 255));
-        deleteLabel.setText("Delete");
-        deleteLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+        RETURN.setFont(new java.awt.Font("Tahoma", 1, 18));
+        RETURN.setForeground(new java.awt.Color(255, 255, 255));
+        RETURN.setText("Return");
+        RETURN.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                deleteSelectedBook();
+                returnSelectedBook();
             }
         });
-        deletePanel.add(deleteLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 30));
+        ReturnPanel.add(RETURN, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 30));
 
-        getContentPane().add(deletePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 214, 120, 30));
+        getContentPane().add(ReturnPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 188, 120, 30));
 
         bck.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png")));
         bck.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                Staff stff = new Staff();
-                stff.setVisible(true);
+                userDashboard ud = new userDashboard();
+                ud.setVisible(true);
                 dispose();
             }
         });
@@ -153,16 +162,16 @@ public class viewbooks extends javax.swing.JFrame {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new viewbooks().setVisible(true);
+                new Return().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel RETURN;
+    private javax.swing.JPanel ReturnPanel;
     private javax.swing.JLabel bck;
     private javax.swing.JPanel booksGrid;
-    private javax.swing.JLabel deleteLabel;
-    private javax.swing.JPanel deletePanel;
     private javax.swing.JLabel frame;
     private javax.swing.JScrollPane galleryScroll;
     // End of variables declaration//GEN-END:variables
@@ -172,7 +181,7 @@ public class viewbooks extends javax.swing.JFrame {
         card.setOpaque(true);
         card.setBackground(new Color(14, 14, 18));
         card.setBorder(BorderFactory.createEmptyBorder(1, 1, 3, 1));
-        card.setPreferredSize(new Dimension(116, 232));
+        card.setPreferredSize(new Dimension(116, 220));
         card.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         card.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -185,19 +194,25 @@ public class viewbooks extends javax.swing.JFrame {
         titleLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
         titleLabel.setForeground(new Color(245, 245, 245));
         titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        card.add(titleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 154, 108, 24));
+        card.add(titleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 152, 108, 22));
 
         JLabel authorLabel = new JLabel("<html><div style='text-align:center;'>Author : " + safeText(item.author) + "</div></html>");
         authorLabel.setFont(new Font("Tahoma", Font.PLAIN, 10));
         authorLabel.setForeground(new Color(222, 222, 222));
         authorLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        card.add(authorLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 178, 108, 20));
+        card.add(authorLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 174, 108, 16));
 
         JLabel metaLabel = new JLabel("<html><div style='text-align:center;'>Publisher : " + safeText(item.publisher) + "<br>Year Publish : " + safeText(item.publishYear) + "</div></html>");
         metaLabel.setFont(new Font("Tahoma", Font.PLAIN, 9));
         metaLabel.setForeground(new Color(196, 196, 196));
         metaLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        card.add(metaLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 200, 108, 30));
+        card.add(metaLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 190, 108, 20));
+
+        JLabel statusLabel = new JLabel("Status : " + safeText(item.status));
+        statusLabel.setFont(new Font("Tahoma", Font.PLAIN, 10));
+        statusLabel.setForeground(new Color(255, 170, 170));
+        statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        card.add(statusLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 208, 108, 12));
 
         java.awt.event.MouseAdapter clickHandler = new java.awt.event.MouseAdapter() {
             @Override
@@ -211,6 +226,7 @@ public class viewbooks extends javax.swing.JFrame {
         titleLabel.addMouseListener(clickHandler);
         authorLabel.addMouseListener(clickHandler);
         metaLabel.addMouseListener(clickHandler);
+        statusLabel.addMouseListener(clickHandler);
 
         return card;
     }
@@ -230,6 +246,52 @@ public class viewbooks extends javax.swing.JFrame {
             }
         }
         booksGrid.repaint();
+    }
+
+    private void returnSelectedBook() {
+        if (selectedBookId == null) {
+            JOptionPane.showMessageDialog(this, "Please select a borrowed book first.");
+            return;
+        }
+
+        Connection conn = null;
+        try {
+            conn = config.connectDB();
+            conn.setAutoCommit(false);
+
+            int updated;
+            try (PreparedStatement pst = conn.prepareStatement(
+                    "UPDATE tbl_borrower SET status = 'Available' WHERE book_id = ? AND U_name = ? AND COALESCE(status,'') = 'Borrowed'")) {
+                pst.setInt(1, selectedBookId);
+                pst.setString(2, Session.getUsername());
+                updated = pst.executeUpdate();
+            }
+
+            if (updated > 0) {
+                conn.commit();
+                JOptionPane.showMessageDialog(this, "Book returned successfully.");
+                loadBorrowedBooks();
+            } else {
+                conn.rollback();
+                JOptionPane.showMessageDialog(this, "No borrowed book was returned.");
+            }
+        } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (Exception ignored) {
+                }
+            }
+            JOptionPane.showMessageDialog(this, "Unable to return the selected book: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (Exception ignored) {
+                }
+            }
+        }
     }
 
     private ImageIcon loadPosterImage(String imagePath, int width, int height) {
@@ -276,79 +338,30 @@ public class viewbooks extends javax.swing.JFrame {
         return new ImageIcon(image);
     }
 
-    private void deleteSelectedBook() {
-        if (selectedBookId == null) {
-            JOptionPane.showMessageDialog(this, "Please select a book first.");
-            return;
-        }
-
-        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete the selected book?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) {
-            return;
-        }
-
-        Connection conn = null;
-        try {
-            conn = config.connectDB();
-            conn.setAutoCommit(false);
-            int rowsDeleted;
-            try (PreparedStatement deletePst = conn.prepareStatement("DELETE FROM tbl_books WHERE b_id = ?")) {
-                deletePst.setInt(1, selectedBookId);
-                rowsDeleted = deletePst.executeUpdate();
-            }
-            if (rowsDeleted > 0) {
-                try (PreparedStatement reorderPst = conn.prepareStatement("UPDATE tbl_books SET b_id = b_id - 1 WHERE b_id > ?")) {
-                    reorderPst.setInt(1, selectedBookId);
-                    reorderPst.executeUpdate();
-                }
-                try (PreparedStatement resetSeqPst = conn.prepareStatement("UPDATE sqlite_sequence SET seq = COALESCE((SELECT MAX(b_id) FROM tbl_books), 0) WHERE name = 'tbl_books'")) {
-                    resetSeqPst.executeUpdate();
-                } catch (Exception ignored) {
-                }
-                conn.commit();
-                JOptionPane.showMessageDialog(this, "Book deleted successfully.");
-                loadBooks();
-            } else {
-                conn.rollback();
-                JOptionPane.showMessageDialog(this, "No book was deleted. Please try again.");
-            }
-        } catch (Exception e) {
-            if (conn != null) {
-                try { conn.rollback(); } catch (Exception ignored) {}
-            }
-            JOptionPane.showMessageDialog(this, "Unable to delete the selected book: " + e.getMessage());
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ignored) {
-                }
-            }
-        }
-    }
-
     private String safeText(String text) {
         return text == null ? "" : text;
     }
 
-    private void styleActionButton(javax.swing.JPanel panel, javax.swing.JLabel label, Color baseColor) {
+    private void styleActionButton(JPanel panel, JLabel label, Color baseColor) {
         final Font originalFont = label.getFont();
         panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panel.setBorder(BorderFactory.createEmptyBorder());
         panel.setOpaque(false);
         panel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
         label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         label.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
         label.setForeground(Color.WHITE);
         label.setCursor(new Cursor(Cursor.HAND_CURSOR));
         label.setOpaque(false);
+
         final javax.swing.JLabel backgroundLabel = new javax.swing.JLabel();
         backgroundLabel.setBounds(0, 0, Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()));
         panel.add(backgroundLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
         panel.setComponentZOrder(backgroundLabel, panel.getComponentCount() - 1);
         panel.setComponentZOrder(label, 0);
         label.setBounds(0, 0, Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()));
+
         panel.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentResized(java.awt.event.ComponentEvent evt) {
@@ -358,6 +371,7 @@ public class viewbooks extends javax.swing.JFrame {
                 fitLabelText(label, originalFont, panel.getWidth() - 16);
             }
         });
+
         panel.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -368,7 +382,10 @@ public class viewbooks extends javax.swing.JFrame {
                 backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, false)));
             }
         });
-        backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()), baseColor, false)));
+
+        backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(
+                Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()), baseColor, false
+        )));
         fitLabelText(label, originalFont, Math.max(1, panel.getWidth() - 16));
     }
 
@@ -424,14 +441,16 @@ public class viewbooks extends javax.swing.JFrame {
         final String publisher;
         final String publishYear;
         final String imagePath;
+        final String status;
 
-        BookItem(int id, String title, String author, String publisher, String publishYear, String imagePath) {
+        BookItem(int id, String title, String author, String publisher, String publishYear, String imagePath, String status) {
             this.id = id;
             this.title = title;
             this.author = author;
             this.publisher = publisher;
             this.publishYear = publishYear;
             this.imagePath = imagePath;
+            this.status = status;
         }
     }
 }
