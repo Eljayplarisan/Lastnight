@@ -8,6 +8,14 @@ package Admin;
 import Main.login;
 import config.Session;
 import config.config;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import javax.swing.JOptionPane;
 
 /**
@@ -16,11 +24,14 @@ import javax.swing.JOptionPane;
  */
 public class Viewbook extends javax.swing.JFrame {
 
+    private Integer selectedBookId;
+
     /**
     
      */
     public Viewbook() {
         initComponents();
+        styleActionButton(deletePanel, deleteLabel, new Color(30, 95, 95));
         getData();
         
         if (!Session.isLoggedIn()) {
@@ -33,7 +44,7 @@ public class Viewbook extends javax.swing.JFrame {
     
      void getData(){
         config con = new config();
-        String sql = "SELECT * FROM tbl_books";
+        String sql = "SELECT b_id, b_title, b_author, b_publisher, b_publish FROM tbl_books";
         con.displayData(sql, vtable);
     }
 
@@ -48,6 +59,8 @@ public class Viewbook extends javax.swing.JFrame {
 
         viewbook = new javax.swing.JScrollPane();
         vtable = new javax.swing.JTable();
+        deletePanel = new javax.swing.JPanel();
+        deleteLabel = new javax.swing.JLabel();
         back = new javax.swing.JLabel();
         frame = new javax.swing.JLabel();
 
@@ -65,9 +78,35 @@ public class Viewbook extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        vtable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                vtableMouseClicked(evt);
+            }
+        });
         viewbook.setViewportView(vtable);
 
-        getContentPane().add(viewbook, new org.netbeans.lib.awtextra.AbsoluteConstraints(92, 50, 490, 300));
+        getContentPane().add(viewbook, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 20, 450, 320));
+
+        deletePanel.setBackground(new java.awt.Color(30, 95, 95));
+        deletePanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        deletePanel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                deletePanelMouseClicked(evt);
+            }
+        });
+        deletePanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        deleteLabel.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        deleteLabel.setForeground(new java.awt.Color(255, 255, 255));
+        deleteLabel.setText("Delete");
+        deleteLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                deleteLabelMouseClicked(evt);
+            }
+        });
+        deletePanel.add(deleteLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 30));
+
+        getContentPane().add(deletePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 170, 120, 30));
 
         back.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png"))); // NOI18N
         back.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -89,6 +128,22 @@ public class Viewbook extends javax.swing.JFrame {
        ua.setVisible(true);
        this.dispose();//        // TODO add your handling code here:
     }//GEN-LAST:event_backMouseClicked
+
+    private void vtableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vtableMouseClicked
+        int selectedRow = vtable.getSelectedRow();
+        if (selectedRow < 0) {
+            return;
+        }
+        selectedBookId = Integer.parseInt(String.valueOf(vtable.getValueAt(selectedRow, 0)));
+    }//GEN-LAST:event_vtableMouseClicked
+
+    private void deletePanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deletePanelMouseClicked
+        deleteSelectedBook();
+    }//GEN-LAST:event_deletePanelMouseClicked
+
+    private void deleteLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteLabelMouseClicked
+        deleteSelectedBook();
+    }//GEN-LAST:event_deleteLabelMouseClicked
 
     /**
      * @param args the command line arguments
@@ -127,8 +182,178 @@ public class Viewbook extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel back;
+    private javax.swing.JLabel deleteLabel;
+    private javax.swing.JPanel deletePanel;
     private javax.swing.JLabel frame;
     private javax.swing.JScrollPane viewbook;
     private javax.swing.JTable vtable;
     // End of variables declaration//GEN-END:variables
+
+    private void deleteSelectedBook() {
+        if (selectedBookId == null) {
+            JOptionPane.showMessageDialog(this, "Please select a book from the table first.");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to delete the selected book?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        Connection conn = null;
+        try {
+            conn = config.connectDB();
+            conn.setAutoCommit(false);
+
+            int rowsDeleted;
+            try (PreparedStatement deletePst = conn.prepareStatement("DELETE FROM tbl_books WHERE b_id = ?")) {
+                deletePst.setInt(1, selectedBookId);
+                rowsDeleted = deletePst.executeUpdate();
+            }
+
+            if (rowsDeleted > 0) {
+                try (PreparedStatement reorderPst = conn.prepareStatement(
+                        "UPDATE tbl_books SET b_id = b_id - 1 WHERE b_id > ?")) {
+                    reorderPst.setInt(1, selectedBookId);
+                    reorderPst.executeUpdate();
+                }
+
+                try (PreparedStatement resetSeqPst = conn.prepareStatement(
+                        "UPDATE sqlite_sequence SET seq = COALESCE((SELECT MAX(b_id) FROM tbl_books), 0) WHERE name = 'tbl_books'")) {
+                    resetSeqPst.executeUpdate();
+                } catch (Exception ignored) {
+                    // Table may not use AUTOINCREMENT, so sqlite_sequence might not exist for tbl_books.
+                }
+
+                conn.commit();
+                JOptionPane.showMessageDialog(this, "Book deleted successfully.");
+                selectedBookId = null;
+                getData();
+                vtable.clearSelection();
+            } else {
+                conn.rollback();
+                JOptionPane.showMessageDialog(this, "No book was deleted. Please try again.");
+            }
+        } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (Exception ignored) {
+                }
+            }
+            JOptionPane.showMessageDialog(this, "Unable to delete the selected book: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (Exception ignored) {
+                }
+            }
+        }
+    }
+
+    private void styleActionButton(javax.swing.JPanel panel, javax.swing.JLabel label, Color baseColor) {
+        final Font originalFont = label.getFont();
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panel.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+        panel.setOpaque(false);
+        panel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setForeground(Color.WHITE);
+        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        label.setOpaque(false);
+
+        final javax.swing.JLabel backgroundLabel = new javax.swing.JLabel();
+        backgroundLabel.setBounds(0, 0, Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()));
+        panel.add(backgroundLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        panel.setComponentZOrder(backgroundLabel, panel.getComponentCount() - 1);
+        panel.setComponentZOrder(label, 0);
+        label.setBounds(0, 0, Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()));
+
+        panel.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                backgroundLabel.setBounds(0, 0, panel.getWidth(), panel.getHeight());
+                backgroundLabel.setIcon(new javax.swing.ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, false)));
+                label.setBounds(0, 0, panel.getWidth(), panel.getHeight());
+                fitLabelText(label, originalFont, panel.getWidth() - 16);
+            }
+        });
+
+        panel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                backgroundLabel.setIcon(new javax.swing.ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, true)));
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                backgroundLabel.setIcon(new javax.swing.ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, false)));
+            }
+        });
+
+        backgroundLabel.setIcon(new javax.swing.ImageIcon(createGlossyButtonImage(
+                Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()), baseColor, false
+        )));
+        fitLabelText(label, originalFont, Math.max(1, panel.getWidth() - 16));
+    }
+
+    private void fitLabelText(javax.swing.JLabel label, Font baseFont, int maxWidth) {
+        int targetSize = baseFont.getSize();
+        while (targetSize > 11) {
+            Font testFont = new Font(baseFont.getName(), baseFont.getStyle(), targetSize);
+            int textWidth = label.getFontMetrics(testFont).stringWidth(label.getText().trim());
+            if (textWidth <= maxWidth) {
+                label.setFont(testFont);
+                return;
+            }
+            targetSize--;
+        }
+        label.setFont(new Font(baseFont.getName(), baseFont.getStyle(), 11));
+    }
+
+    private BufferedImage createGlossyButtonImage(int width, int height, Color baseColor, boolean hover) {
+        int w = Math.max(width, 1);
+        int h = Math.max(height, 1);
+        BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        Color outer = hover ? adjustColor(baseColor, 55) : adjustColor(baseColor, 35);
+        Color top = hover ? adjustColor(baseColor, 22) : adjustColor(baseColor, 8);
+        Color bottom = hover ? adjustColor(baseColor, -12) : adjustColor(baseColor, -24);
+        Color shineTop = new Color(255, 255, 255, hover ? 180 : 165);
+        Color shineBottom = new Color(255, 255, 255, 20);
+
+        int arc = h - 2;
+        g2.setColor(outer);
+        g2.fillRoundRect(0, 0, w - 1, h - 1, arc, arc);
+
+        g2.setPaint(new java.awt.GradientPaint(0, 2, top, 0, h - 3, bottom));
+        g2.fillRoundRect(3, 3, w - 6, h - 6, Math.max(10, arc - 6), Math.max(10, arc - 6));
+
+        g2.setPaint(new java.awt.GradientPaint(0, 5, shineTop, 0, h / 2, shineBottom));
+        g2.fillRoundRect(12, 5, Math.max(1, w - 24), Math.max(8, (h / 2) - 3), Math.max(8, arc - 18), Math.max(8, arc - 18));
+
+        g2.setColor(new Color(255, 255, 255, 170));
+        g2.drawRoundRect(1, 1, w - 3, h - 3, arc, arc);
+        g2.dispose();
+        return image;
+    }
+
+    private Color adjustColor(Color color, int amount) {
+        int red = Math.max(0, Math.min(255, color.getRed() + amount));
+        int green = Math.max(0, Math.min(255, color.getGreen() + amount));
+        int blue = Math.max(0, Math.min(255, color.getBlue() + amount));
+        return new Color(red, green, blue);
+    }
 }

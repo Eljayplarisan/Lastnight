@@ -140,12 +140,12 @@ public class Update extends javax.swing.JFrame {
         pss.setForeground(new java.awt.Color(255, 255, 255));
         pss.setText("Password");
         jPanel1.add(pss, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 160, -1, -1));
-        jPanel1.add(name, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 100, 30));
-        jPanel1.add(uname, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 110, 100, 30));
+        jPanel1.add(name, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 95, 30));
+        jPanel1.add(uname, new org.netbeans.lib.awtextra.AbsoluteConstraints(115, 110, 95, 30));
 
         email.setCaretColor(new java.awt.Color(255, 255, 255));
-        jPanel1.add(email, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 100, 30));
-        jPanel1.add(pass, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 180, 100, 30));
+        jPanel1.add(email, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 95, 30));
+        jPanel1.add(pass, new org.netbeans.lib.awtextra.AbsoluteConstraints(115, 180, 95, 30));
 
         up.setBackground(new java.awt.Color(30, 95, 95));
         up.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -181,7 +181,7 @@ public class Update extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(table);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(235, 40, 395, 300));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 60, 370, 280));
 
         back.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png"))); // NOI18N
         back.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -410,12 +410,13 @@ public class Update extends javax.swing.JFrame {
     private void styleTextField(JTextField field) {
         field.setBackground(defaultTextFieldBackground);
         field.setForeground(new Color(42, 48, 66));
-        field.setCaretColor(new Color(80, 56, 190));
+        field.setCaretColor(new Color(25, 25, 25));
         field.setBorder(defaultTextFieldBorder);
         field.setFont(new Font("Tahoma", Font.PLAIN, 12));
         field.setEditable(true);
         field.setEnabled(true);
         field.setFocusable(true);
+        field.putClientProperty("caretWidth", 3);
         field.setMargin(new Insets(4, 8, 4, 8));
         field.setSelectionColor(new Color(196, 180, 255));
         field.setSelectedTextColor(new Color(32, 24, 68));
