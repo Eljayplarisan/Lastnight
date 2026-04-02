@@ -5,16 +5,34 @@ import Main.login;
 import User.borrow;
 import config.Session;
 import config.config;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 
 public class Admin extends javax.swing.JFrame {
 
     public Admin() {
         initComponents();
+        styleActionButton(dashboard, jLabel7);
+        styleActionButton(User, userBtn);
+        styleActionButton(updte, update);
+        styleActionButton(del, Delte);
+        styleActionButton(addbooks, jLabel1);
+        styleActionButton(list, transac);
+        styleActionButton(view, book);
+        styleActionButton(jPanel6, jLabel5);
         loadUserProfile();
         
         if (!Session.isLoggedIn()) {
@@ -45,6 +63,86 @@ public class Admin extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error loading profile: " + e.getMessage());
         }
+    }
+
+    private void styleActionButton(JPanel panel, JLabel label) {
+        final Color baseColor = panel.getBackground();
+        panel.setBorder(BorderFactory.createEmptyBorder());
+        panel.setOpaque(false);
+        panel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setForeground(Color.WHITE);
+        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        label.setOpaque(false);
+
+        final JLabel backgroundLabel = new JLabel();
+        backgroundLabel.setBounds(0, 0, Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()));
+        panel.add(backgroundLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        panel.setComponentZOrder(backgroundLabel, panel.getComponentCount() - 1);
+        panel.setComponentZOrder(label, 0);
+
+        panel.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                backgroundLabel.setBounds(0, 0, panel.getWidth(), panel.getHeight());
+                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, false)));
+            }
+        });
+
+        panel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, true)));
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, false)));
+            }
+        });
+        
+        backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(
+                Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()), baseColor, false
+        )));
+    }
+
+    private BufferedImage createGlossyButtonImage(int width, int height, Color baseColor, boolean hover) {
+        int w = Math.max(width, 1);
+        int h = Math.max(height, 1);
+        BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        Color outer = hover ? adjustColor(baseColor, 110) : adjustColor(baseColor, 80);
+        Color top = hover ? adjustColor(baseColor, 45) : adjustColor(baseColor, 25);
+        Color bottom = hover ? adjustColor(baseColor, -35) : adjustColor(baseColor, -20);
+        Color shineTop = new Color(255, 255, 255, hover ? 180 : 165);
+        Color shineBottom = new Color(255, 255, 255, 20);
+
+        int arc = h - 2;
+        g2.setColor(outer);
+        g2.fillRoundRect(0, 0, w - 1, h - 1, arc, arc);
+
+        g2.setPaint(new java.awt.GradientPaint(0, 2, top, 0, h - 3, bottom));
+        g2.fillRoundRect(3, 3, w - 6, h - 6, Math.max(10, arc - 6), Math.max(10, arc - 6));
+
+        g2.setPaint(new java.awt.GradientPaint(0, 5, shineTop, 0, h / 2, shineBottom));
+        g2.fillRoundRect(12, 5, Math.max(1, w - 24), Math.max(8, (h / 2) - 3), Math.max(8, arc - 18), Math.max(8, arc - 18));
+
+        g2.setColor(new Color(255, 255, 255, 170));
+        g2.drawRoundRect(1, 1, w - 3, h - 3, arc, arc);
+        g2.dispose();
+        return image;
+    }
+
+    private Color adjustColor(Color color, int amount) {
+        int red = Math.max(0, Math.min(255, color.getRed() + amount));
+        int green = Math.max(0, Math.min(255, color.getGreen() + amount));
+        int blue = Math.max(0, Math.min(255, color.getBlue() + amount));
+        return new Color(red, green, blue);
     }
 
     @SuppressWarnings("unchecked")
@@ -108,7 +206,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(LBName, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 120, 100, 30));
 
         jPanel6.setBackground(new java.awt.Color(73, 105, 164));
-        jPanel6.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        jPanel6.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel6.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jPanel6MouseClicked(evt);
@@ -124,7 +222,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 310, 120, 30));
 
         updte.setBackground(new java.awt.Color(73, 105, 164));
-        updte.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        updte.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         updte.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 updteMouseClicked(evt);
@@ -146,7 +244,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(updte, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 140, 130, 30));
 
         User.setBackground(new java.awt.Color(73, 105, 164));
-        User.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        User.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         User.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 UserMouseClicked(evt);
@@ -167,7 +265,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(User, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 100, 130, 30));
 
         dashboard.setBackground(new java.awt.Color(73, 105, 164));
-        dashboard.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        dashboard.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         dashboard.setForeground(new java.awt.Color(255, 255, 255));
         dashboard.setAlignmentY(2.2F);
         dashboard.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -190,7 +288,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(dashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 60, 130, 30));
 
         del.setBackground(new java.awt.Color(73, 105, 164));
-        del.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        del.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         del.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 delMouseClicked(evt);
@@ -212,7 +310,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(del, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 180, 130, 30));
 
         addbooks.setBackground(new java.awt.Color(73, 105, 164));
-        addbooks.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        addbooks.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         addbooks.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 addbooksMouseClicked(evt);
@@ -233,7 +331,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(addbooks, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 60, 130, 30));
 
         list.setBackground(new java.awt.Color(73, 105, 164));
-        list.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        list.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         list.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         transac.setBackground(new java.awt.Color(73, 105, 164));
@@ -250,7 +348,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(list, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 140, 130, 30));
 
         view.setBackground(new java.awt.Color(73, 105, 164));
-        view.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        view.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         view.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         book.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
@@ -331,7 +429,7 @@ public class Admin extends javax.swing.JFrame {
     }//GEN-LAST:event_transacMouseClicked
 
     private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
-        admimUser au = new admimUser();
+        Approve au = new Approve();
         au.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jLabel7MouseClicked

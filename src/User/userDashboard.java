@@ -5,9 +5,8 @@
  */
 package User;
 
-import Admin.admimUser;
+import Admin.Approve;
 import Main.login;
-import User.userProfile;
 import config.Session;
 import config.config;
 import java.sql.Connection;
@@ -74,7 +73,7 @@ public class userDashboard extends javax.swing.JFrame {
         lbEmail = new javax.swing.JLabel();
         LBName = new javax.swing.JLabel();
         LBEmail = new javax.swing.JLabel();
-        backphoto = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -92,21 +91,21 @@ public class userDashboard extends javax.swing.JFrame {
 
         book.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
         book.setForeground(new java.awt.Color(255, 255, 255));
-        book.setText("Return Books");
+        book.setText("Borrow Books");
         book.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 bookMouseClicked(evt);
             }
         });
-        books.add(book, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 100, 30));
+        books.add(book, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 110, 30));
 
-        jPanel2.add(books, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 130, 120, 30));
+        jPanel2.add(books, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 90, 120, 30));
 
         log.setBackground(new java.awt.Color(73, 105, 164));
         log.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         log.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        Logout.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        Logout.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
         Logout.setForeground(new java.awt.Color(255, 255, 255));
         Logout.setText("Logout");
         Logout.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -114,9 +113,9 @@ public class userDashboard extends javax.swing.JFrame {
                 LogoutMouseClicked(evt);
             }
         });
-        log.add(Logout, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 0, -1, 30));
+        log.add(Logout, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 0, 70, 30));
 
-        jPanel2.add(log, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 320, 120, 30));
+        jPanel2.add(log, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 310, 120, 30));
 
         Text.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         Text.setForeground(new java.awt.Color(255, 255, 255));
@@ -134,7 +133,7 @@ public class userDashboard extends javax.swing.JFrame {
 
         book1.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
         book1.setForeground(new java.awt.Color(255, 255, 255));
-        book1.setText("Borrow Books");
+        book1.setText("Return Books");
         book1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 book1MouseClicked(evt);
@@ -142,7 +141,7 @@ public class userDashboard extends javax.swing.JFrame {
         });
         books1.add(book1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, -1, 30));
 
-        jPanel2.add(books1, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 80, 120, 30));
+        jPanel2.add(books1, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 130, 120, 30));
 
         profile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/profile.png"))); // NOI18N
         jPanel2.add(profile, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 100, 70));
@@ -166,18 +165,22 @@ public class userDashboard extends javax.swing.JFrame {
         LBEmail.setForeground(new java.awt.Color(255, 255, 255));
         jPanel2.add(LBEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 160, 120, 30));
 
-        backphoto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/fan.jpg"))); // NOI18N
-        jPanel2.add(backphoto, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 520, 360));
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/fan.jpg"))); // NOI18N
+        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 540, -1));
 
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 520, 360));
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 540, 360));
 
-        setSize(new java.awt.Dimension(535, 401));
+        setSize(new java.awt.Dimension(557, 401));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void booksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_booksMouseClicked
-     
-    }//GEN-LAST:event_booksMouseClicked
+    private void books1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_books1MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_books1MouseClicked
+
+    private void book1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_book1MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_book1MouseClicked
 
     private void LogoutMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LogoutMouseClicked
         login log = new login();
@@ -185,19 +188,15 @@ public class userDashboard extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_LogoutMouseClicked
 
+    private void booksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_booksMouseClicked
+
+    }//GEN-LAST:event_booksMouseClicked
+
     private void bookMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bookMouseClicked
         brrw_bks bb = new brrw_bks();
         bb.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_bookMouseClicked
-
-    private void book1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_book1MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_book1MouseClicked
-
-    private void books1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_books1MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_books1MouseClicked
 
     /**
      * @param args the command line arguments
@@ -240,11 +239,11 @@ public class userDashboard extends javax.swing.JFrame {
     private javax.swing.JLabel LBName;
     private javax.swing.JLabel Logout;
     private javax.swing.JLabel Text;
-    private javax.swing.JLabel backphoto;
     private javax.swing.JLabel book;
     private javax.swing.JLabel book1;
     private javax.swing.JPanel books;
     private javax.swing.JPanel books1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lbEmail;
     private javax.swing.JLabel lbName;

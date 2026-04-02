@@ -83,12 +83,10 @@ public class Update extends javax.swing.JFrame {
         fname = new javax.swing.JLabel();
         unme = new javax.swing.JLabel();
         eml = new javax.swing.JLabel();
-        User_id = new javax.swing.JLabel();
         pss = new javax.swing.JLabel();
         name = new javax.swing.JTextField();
         uname = new javax.swing.JTextField();
         email = new javax.swing.JTextField();
-        id = new javax.swing.JTextField();
         pass = new javax.swing.JTextField();
         up = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -117,11 +115,6 @@ public class Update extends javax.swing.JFrame {
         eml.setText("Email");
         jPanel1.add(eml, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, -1, -1));
 
-        User_id.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        User_id.setForeground(new java.awt.Color(255, 255, 255));
-        User_id.setText("User Id");
-        jPanel1.add(User_id, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 40, -1, -1));
-
         pss.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         pss.setForeground(new java.awt.Color(255, 255, 255));
         pss.setText("Password");
@@ -131,7 +124,6 @@ public class Update extends javax.swing.JFrame {
 
         email.setCaretColor(new java.awt.Color(255, 255, 255));
         jPanel1.add(email, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 90, -1));
-        jPanel1.add(id, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, 80, -1));
         jPanel1.add(pass, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 180, 90, -1));
 
         up.setBackground(new java.awt.Color(30, 95, 95));
@@ -189,24 +181,13 @@ public class Update extends javax.swing.JFrame {
 
     private void upMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_upMouseClicked
    
-       String idText = id.getText().trim();
+      
 
-    if (idText.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Please select a user first!");
-        return;
-    }
-
-    if (!idText.matches("\\d+")) {
-        JOptionPane.showMessageDialog(this, "Invalid ID format!");
-        return;
-    }
-
-    int userId = Integer.parseInt(idText);
 
     try (Connection con = getConnection()) {
         PreparedStatement checkPst = con.prepareStatement(
                 "SELECT 1 FROM tbl_data WHERE u_id = ?");
-        checkPst.setInt(1, userId);
+        
         ResultSet rs = checkPst.executeQuery();
 
         if (!rs.next()) {
@@ -220,7 +201,7 @@ public class Update extends javax.swing.JFrame {
         pst.setString(2, uname.getText().trim());
         pst.setString(3, email.getText().trim());
         pst.setString(4, pass.getText().trim());
-        pst.setInt(5, userId);
+    
 
         int rowsUpdated = pst.executeUpdate();
 
@@ -240,7 +221,7 @@ public class Update extends javax.swing.JFrame {
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
     int selectedRow = table.getSelectedRow();
 
-    User_id.setText(table.getValueAt(selectedRow, 0).toString());
+   
     fname.setText(table.getValueAt(selectedRow, 1).toString());
     unme.setText(table.getValueAt(selectedRow, 2).toString());
     eml.setText(table.getValueAt(selectedRow, 3).toString());
@@ -289,13 +270,11 @@ public class Update extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel User_id;
     private javax.swing.JLabel back;
     private javax.swing.JLabel bckgrnd;
     private javax.swing.JTextField email;
     private javax.swing.JLabel eml;
     private javax.swing.JLabel fname;
-    private javax.swing.JTextField id;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;

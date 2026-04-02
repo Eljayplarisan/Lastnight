@@ -3,48 +3,39 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Admin;
+package Staff;
 
 import Main.login;
 import config.Session;
 import config.config;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author Eljay
  */
-public class Delete extends javax.swing.JFrame {
+public class delete extends javax.swing.JFrame {
 
     /**
-     * Creates new form Delete
+     * Creates new form delete
      */
-    public Delete() {
+    public delete() {
         initComponents();
-        getData();
         
-        if (!Session.isLoggedIn()) {
+         if (!Session.isLoggedIn()) {
         JOptionPane.showMessageDialog(this, "You must login first!");
         login log = new login();
         log.setVisible(true);
         this.dispose();
         }
+       getData();
     }
-     
-    void getData(){
+    
+     void getData(){
         config con = new config();
         String sql = "SELECT * FROM tbl_data";
         con.displayData(sql, table);
     }
-    
-   
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -56,10 +47,10 @@ public class Delete extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
-        Del = new javax.swing.JPanel();
+        del = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        back = new javax.swing.JLabel();
-        Frame = new javax.swing.JLabel();
+        bck = new javax.swing.JLabel();
+        frame = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -84,73 +75,53 @@ public class Delete extends javax.swing.JFrame {
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 60, 440, 280));
 
-        Del.setBackground(new java.awt.Color(30, 95, 95));
-        Del.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        Del.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                DelMouseClicked(evt);
-            }
-        });
-        Del.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        del.setBackground(new java.awt.Color(30, 95, 95));
+        del.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        del.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Delete");
-        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+        del.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(29, 0, 60, 30));
+
+        getContentPane().add(del, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, 120, 30));
+
+        bck.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png"))); // NOI18N
+        bck.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel1MouseClicked(evt);
+                bckMouseClicked(evt);
             }
         });
-        Del.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 0, 70, 30));
+        getContentPane().add(bck, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 290, 50, 50));
 
-        getContentPane().add(Del, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, 120, 30));
-
-        back.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png"))); // NOI18N
-        back.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                backMouseClicked(evt);
-            }
-        });
-        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 290, 50, 50));
-
-        Frame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/ima.jpg"))); // NOI18N
-        getContentPane().add(Frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 360));
+        frame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/ima.jpg"))); // NOI18N
+        getContentPane().add(frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
-            
+
         int selectedRow = table.getSelectedRow();
-            if (selectedRow == -1) {
-                JOptionPane.showMessageDialog(null, "Please select a row first!");
-                return;
-            }
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Please select a row first!");
+            return;
+        }
 
-            // 2️⃣ Convert view row to model row (important if table is sortable)
-            int modelRow = table.convertRowIndexToModel(selectedRow);
+        // 2️⃣ Convert view row to model row (important if table is sortable)
+        int modelRow = table.convertRowIndexToModel(selectedRow);
 
-            // 3️⃣ Populate text fields safely
-            
+        // 3️⃣ Populate text fields safely
 
-// TODO add your handling code here:
+        // TODO add your handling code here:
     }//GEN-LAST:event_tableMouseClicked
 
-    private void DelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DelMouseClicked
-
-    }//GEN-LAST:event_DelMouseClicked
-
-    private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-   
-   
-    }//GEN-LAST:event_jLabel1MouseClicked
-
-    private void backMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_backMouseClicked
-       Admin ua = new Admin();
-       ua.setVisible(true);
-       this.dispose();//
-    }//GEN-LAST:event_backMouseClicked
+    private void bckMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bckMouseClicked
+       Staff stff = new Staff();
+       stff.setVisible(true);
+       this.dispose();
+    }//GEN-LAST:event_bckMouseClicked
 
     /**
      * @param args the command line arguments
@@ -169,28 +140,28 @@ public class Delete extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Delete.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(delete.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Delete.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(delete.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Delete.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(delete.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Delete.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(delete.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Delete().setVisible(true);
+                new delete().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel Del;
-    private javax.swing.JLabel Frame;
-    private javax.swing.JLabel back;
+    private javax.swing.JLabel bck;
+    private javax.swing.JPanel del;
+    private javax.swing.JLabel frame;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable table;

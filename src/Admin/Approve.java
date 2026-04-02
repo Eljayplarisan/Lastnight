@@ -11,9 +11,9 @@ import java.sql.PreparedStatement;
 import javax.swing.JOptionPane;
 
 
-public class admimUser extends javax.swing.JFrame {
+public class Approve extends javax.swing.JFrame {
 
-    public admimUser() {
+    public Approve() {
         initComponents();
         getData();
         
@@ -41,7 +41,6 @@ public class admimUser extends javax.swing.JFrame {
         jList1 = new javax.swing.JList<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         utable = new javax.swing.JTable();
-        approve = new javax.swing.JButton();
         back = new javax.swing.JLabel();
         frame = new javax.swing.JLabel();
 
@@ -73,24 +72,7 @@ public class admimUser extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(utable);
 
-        frame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/ima.jpg"))); // NOI18N
-        getContentPane().add(frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 350));
-
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 20, 460, 320));
-
-        approve.setBackground(new java.awt.Color(30, 95, 95));
-        approve.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        approve.setForeground(new java.awt.Color(255, 255, 255));
-        approve.setText("Approve");
-        approve.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                approveMouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                approveMouseEntered(evt);
-            }
-        });
-        getContentPane().add(approve, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 250, 100, 30));
 
         back.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png"))); // NOI18N
         back.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -99,10 +81,9 @@ public class admimUser extends javax.swing.JFrame {
             }
         });
         getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, 50, 50));
-        getContentPane().setComponentZOrder(frame, getContentPane().getComponentCount() - 1);
-        getContentPane().setComponentZOrder(jScrollPane1, getContentPane().getComponentCount() - 2);
-        getContentPane().setComponentZOrder(approve, getContentPane().getComponentCount() - 3);
-        getContentPane().setComponentZOrder(back, getContentPane().getComponentCount() - 4);
+
+        frame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/ima.jpg"))); // NOI18N
+        getContentPane().add(frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 350));
 
         pack();
         setLocationRelativeTo(null);
@@ -143,26 +124,26 @@ public class admimUser extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(admimUser.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Approve.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(admimUser.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Approve.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(admimUser.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Approve.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(admimUser.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Approve.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new admimUser().setVisible(true);
+                new Approve().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton approve;
     private javax.swing.JLabel back;
     private javax.swing.JLabel frame;
     private javax.swing.JList<String> jList1;

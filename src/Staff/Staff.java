@@ -79,14 +79,14 @@ public class Staff extends javax.swing.JFrame {
         lbEmail = new javax.swing.JLabel();
         LBName = new javax.swing.JLabel();
         LBEmail = new javax.swing.JLabel();
-        del = new javax.swing.JPanel();
-        Delte = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
-        view = new javax.swing.JPanel();
-        book = new javax.swing.JLabel();
         books = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
+        View = new javax.swing.JPanel();
+        viewboks = new javax.swing.JLabel();
+        del = new javax.swing.JPanel();
+        DEL = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -121,28 +121,6 @@ public class Staff extends javax.swing.JFrame {
         LBEmail.setForeground(new java.awt.Color(255, 255, 255));
         jPanel1.add(LBEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 160, 120, 30));
 
-        del.setBackground(new java.awt.Color(73, 105, 164));
-        del.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        del.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                delMouseClicked(evt);
-            }
-        });
-        del.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        Delte.setBackground(new java.awt.Color(191, 153, 114));
-        Delte.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
-        Delte.setForeground(new java.awt.Color(255, 255, 255));
-        Delte.setText("Delete");
-        Delte.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                DelteMouseClicked(evt);
-            }
-        });
-        del.add(Delte, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 0, 60, 30));
-
-        jPanel1.add(del, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 140, 130, 30));
-
         jPanel6.setBackground(new java.awt.Color(73, 105, 164));
         jPanel6.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel6.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -158,22 +136,6 @@ public class Staff extends javax.swing.JFrame {
         jPanel6.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, -1, 70, 30));
 
         jPanel1.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 310, 120, 30));
-
-        view.setBackground(new java.awt.Color(73, 105, 164));
-        view.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        view.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        book.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
-        book.setForeground(new java.awt.Color(255, 255, 255));
-        book.setText("View Books");
-        book.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                bookMouseClicked(evt);
-            }
-        });
-        view.add(book, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, -1, 90, 30));
-
-        jPanel1.add(view, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 100, 130, 30));
 
         books.setBackground(new java.awt.Color(73, 105, 164));
         books.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -196,6 +158,47 @@ public class Staff extends javax.swing.JFrame {
 
         jPanel1.add(books, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 60, 130, 30));
 
+        View.setBackground(new java.awt.Color(73, 105, 164));
+        View.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        View.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ViewMouseClicked(evt);
+            }
+        });
+
+        viewboks.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
+        viewboks.setForeground(new java.awt.Color(255, 255, 255));
+        viewboks.setText("View Books");
+        viewboks.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                viewboksMouseClicked(evt);
+            }
+        });
+        View.add(viewboks);
+
+        jPanel1.add(View, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 100, 130, 30));
+
+        del.setBackground(new java.awt.Color(73, 105, 164));
+        del.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        del.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                delMouseClicked(evt);
+            }
+        });
+        del.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        DEL.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
+        DEL.setForeground(new java.awt.Color(255, 255, 255));
+        DEL.setText("Delete");
+        DEL.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                DELMouseClicked(evt);
+            }
+        });
+        del.add(DEL, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, -1, -1, 30));
+
+        jPanel1.add(del, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 140, 130, 30));
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/fan.jpg"))); // NOI18N
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
@@ -204,22 +207,6 @@ public class Staff extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void bookMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bookMouseClicked
-        Viewbook vb = new Viewbook();
-        vb.setVisible(true);
-        this.dispose();// TODO add your handling code here:
-    }//GEN-LAST:event_bookMouseClicked
-
-    private void DelteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DelteMouseClicked
-        Delete del = new Delete();
-        del.setVisible(true);
-        this.dispose();// TODO add your handling code here:
-    }//GEN-LAST:event_DelteMouseClicked
-
-    private void delMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_delMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_delMouseClicked
 
     private void jPanel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel6MouseClicked
         login log = new login();
@@ -238,6 +225,30 @@ public class Staff extends javax.swing.JFrame {
       adbks.setVisible(true);
       this.dispose();
     }//GEN-LAST:event_jLabel2MouseClicked
+
+    private void viewboksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_viewboksMouseClicked
+    viewbooks vb = new viewbooks();
+    vb.setVisible(true);
+    this.dispose();
+    }//GEN-LAST:event_viewboksMouseClicked
+
+    private void ViewMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ViewMouseClicked
+    viewbooks vb = new viewbooks();
+    vb.setVisible(true);
+    this.dispose();        // TODO add your handling code here:
+    }//GEN-LAST:event_ViewMouseClicked
+
+    private void DELMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DELMouseClicked
+     delete del = new delete();
+     del.setVisible(true);
+     this.dispose();
+    }//GEN-LAST:event_DELMouseClicked
+
+    private void delMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_delMouseClicked
+     delete del = new delete();
+     del.setVisible(true);
+     this.dispose();
+    }//GEN-LAST:event_delMouseClicked
 
     /**
      * @param args the command line arguments
@@ -275,10 +286,10 @@ public class Staff extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel Delte;
+    private javax.swing.JLabel DEL;
     private javax.swing.JLabel LBEmail;
     private javax.swing.JLabel LBName;
-    private javax.swing.JLabel book;
+    private javax.swing.JPanel View;
     private javax.swing.JPanel books;
     private javax.swing.JLabel dashb;
     private javax.swing.JPanel del;
@@ -290,6 +301,6 @@ public class Staff extends javax.swing.JFrame {
     private javax.swing.JLabel lbEmail;
     private javax.swing.JLabel lbName;
     private javax.swing.JLabel profile;
-    private javax.swing.JPanel view;
+    private javax.swing.JLabel viewboks;
     // End of variables declaration//GEN-END:variables
 }
