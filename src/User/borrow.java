@@ -71,7 +71,7 @@ public class borrow extends javax.swing.JFrame {
         });
         Brrw_table.setViewportView(brrwtable);
 
-        getContentPane().add(Brrw_table, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 30, 480, 300));
+        getContentPane().add(Brrw_table, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 30, 500, 300));
 
         back.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png"))); // NOI18N
         back.addMouseListener(new java.awt.event.MouseAdapter() {

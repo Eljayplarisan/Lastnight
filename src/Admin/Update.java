@@ -6,12 +6,23 @@
 package Admin;
 import Main.login;
 import config.Session;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import config.config;
 
@@ -20,9 +31,19 @@ import config.config;
  * @author Eljay
  */
 public class Update extends javax.swing.JFrame {
+
+    private Integer selectedUserId;
+    private JTextField firstInvalidField;
+    private final Color defaultTextFieldBackground = new Color(248, 250, 255);
+    private final Color errorTextFieldBackground = new Color(255, 235, 238);
+    private final javax.swing.border.Border defaultTextFieldBorder = BorderFactory.createLineBorder(new Color(176, 184, 206), 1);
+    private final javax.swing.border.Border errorTextFieldBorder = BorderFactory.createLineBorder(new Color(220, 53, 69), 3);
     
     public Update() {
         initComponents();
+        jPanel1.setComponentZOrder(bckgrnd, jPanel1.getComponentCount() - 1);
+        styleActionButton(up, jLabel1);
+        initializeTextFieldStyles();
         getData();
         if (!Session.isLoggedIn()) {
         JOptionPane.showMessageDialog(this, "You must login first!");
@@ -34,7 +55,7 @@ public class Update extends javax.swing.JFrame {
     
     void getData(){
         config con = new config();
-        String sql = "SELECT * FROM tbl_data";
+        String sql = "SELECT u_id, u_fname, u_uname, u_email, u_password FROM tbl_data";
         con.displayData(sql, table);
     }
      
@@ -119,12 +140,12 @@ public class Update extends javax.swing.JFrame {
         pss.setForeground(new java.awt.Color(255, 255, 255));
         pss.setText("Password");
         jPanel1.add(pss, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 160, -1, -1));
-        jPanel1.add(name, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 110, 90, -1));
-        jPanel1.add(uname, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 90, -1));
+        jPanel1.add(name, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 100, 30));
+        jPanel1.add(uname, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 110, 100, 30));
 
         email.setCaretColor(new java.awt.Color(255, 255, 255));
-        jPanel1.add(email, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 90, -1));
-        jPanel1.add(pass, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 180, 90, -1));
+        jPanel1.add(email, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 100, 30));
+        jPanel1.add(pass, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 180, 100, 30));
 
         up.setBackground(new java.awt.Color(30, 95, 95));
         up.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -140,7 +161,7 @@ public class Update extends javax.swing.JFrame {
         jLabel1.setText(" Update");
         up.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, 80, 30));
 
-        jPanel1.add(up, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 120, 30));
+        jPanel1.add(up, new org.netbeans.lib.awtextra.AbsoluteConstraints(55, 230, 120, 30));
 
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -160,7 +181,7 @@ public class Update extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(table);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 60, 360, 280));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(235, 40, 395, 300));
 
         back.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png"))); // NOI18N
         back.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -180,52 +201,78 @@ public class Update extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void upMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_upMouseClicked
-   
-      
+        resetValidationStyles();
 
-
-    try (Connection con = getConnection()) {
-        PreparedStatement checkPst = con.prepareStatement(
-                "SELECT 1 FROM tbl_data WHERE u_id = ?");
-        
-        ResultSet rs = checkPst.executeQuery();
-
-        if (!rs.next()) {
-            JOptionPane.showMessageDialog(this, "ID does not exist in database!");
+        if (selectedUserId == null) {
+            JOptionPane.showMessageDialog(this, "Please select a user from the table first.");
             return;
         }
 
-        PreparedStatement pst = con.prepareStatement(
-                "UPDATE tbl_data SET u_fname=?, u_uname=?, u_email=?, u_password=? WHERE u_id=?");
-        pst.setString(1, name.getText().trim());
-        pst.setString(2, uname.getText().trim());
-        pst.setString(3, email.getText().trim());
-        pst.setString(4, pass.getText().trim());
-    
-
-        int rowsUpdated = pst.executeUpdate();
-
-        if (rowsUpdated > 0) {
-            JOptionPane.showMessageDialog(this, "User Updated Successfully!");
-            loadTableData();   // refresh table
-            clearFields();     // clear form
-        } else {
-            JOptionPane.showMessageDialog(this, "Update Failed!");
+        if (!validateRequiredFields()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all required text fields before updating.");
+            if (firstInvalidField != null) {
+                SwingUtilities.invokeLater(() -> {
+                    firstInvalidField.setEditable(true);
+                    firstInvalidField.setEnabled(true);
+                    firstInvalidField.setFocusable(true);
+                    firstInvalidField.requestFocusInWindow();
+                    firstInvalidField.grabFocus();
+                    firstInvalidField.setCaretPosition(firstInvalidField.getText().length());
+                });
+            }
+            return;
         }
 
-    } catch (Exception ex) {
-      
-    }
+        try (Connection con = getConnection()) {
+            PreparedStatement checkPst = con.prepareStatement(
+                    "SELECT 1 FROM tbl_data WHERE u_id = ?");
+            checkPst.setInt(1, selectedUserId);
+            ResultSet rs = checkPst.executeQuery();
+
+            if (!rs.next()) {
+                JOptionPane.showMessageDialog(this, "The selected user could not be found. Please choose the user again.");
+                return;
+            }
+
+            PreparedStatement pst = con.prepareStatement(
+                    "UPDATE tbl_data SET u_fname=?, u_uname=?, u_email=?, u_password=? WHERE u_id=?");
+            pst.setString(1, name.getText().trim());
+            pst.setString(2, uname.getText().trim());
+            pst.setString(3, email.getText().trim());
+            pst.setString(4, pass.getText().trim());
+            pst.setInt(5, selectedUserId);
+
+            int rowsUpdated = pst.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                JOptionPane.showMessageDialog(this, "User details updated successfully.");
+                getData();
+                clearFields();
+            } else {
+                JOptionPane.showMessageDialog(this, "No changes were saved. Please try again.");
+            }
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Unable to update the user right now: " + ex.getMessage());
+        }
     }//GEN-LAST:event_upMouseClicked
 
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
-    int selectedRow = table.getSelectedRow();
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow < 0) {
+            return;
+        }
 
-   
-    fname.setText(table.getValueAt(selectedRow, 1).toString());
-    unme.setText(table.getValueAt(selectedRow, 2).toString());
-    eml.setText(table.getValueAt(selectedRow, 3).toString());
-    pss.setText(table.getValueAt(selectedRow, 4).toString());        // TODO add your handling code here:
+        selectedUserId = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
+        clearInputFieldsOnly();
+        SwingUtilities.invokeLater(() -> {
+            name.setEditable(true);
+            name.setEnabled(true);
+            name.setFocusable(true);
+            name.requestFocusInWindow();
+            name.grabFocus();
+            name.setCaretPosition(name.getText().length());
+        });
     }//GEN-LAST:event_tableMouseClicked
 
     private void backMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_backMouseClicked
@@ -289,8 +336,187 @@ public class Update extends javax.swing.JFrame {
 
 
     private void clearFields() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        selectedUserId = null;
+        clearInputFieldsOnly();
+        table.clearSelection();
     }
 
-    
+    private void clearInputFieldsOnly() {
+        name.setText("");
+        uname.setText("");
+        email.setText("");
+        pass.setText("");
+        resetValidationStyles();
+    }
+
+    private void initializeTextFieldStyles() {
+        styleTextField(name);
+        styleTextField(uname);
+        styleTextField(email);
+        styleTextField(pass);
+        table.setRowHeight(24);
+    }
+
+    private void resetValidationStyles() {
+        name.setBorder(defaultTextFieldBorder);
+        name.setBackground(defaultTextFieldBackground);
+        name.setForeground(new Color(42, 48, 66));
+        uname.setBorder(defaultTextFieldBorder);
+        uname.setBackground(defaultTextFieldBackground);
+        uname.setForeground(new Color(42, 48, 66));
+        email.setBorder(defaultTextFieldBorder);
+        email.setBackground(defaultTextFieldBackground);
+        email.setForeground(new Color(42, 48, 66));
+        pass.setBorder(defaultTextFieldBorder);
+        pass.setBackground(defaultTextFieldBackground);
+        pass.setForeground(new Color(42, 48, 66));
+    }
+
+    private boolean validateRequiredFields() {
+        boolean isValid = true;
+        firstInvalidField = null;
+
+        if (name.getText().trim().isEmpty()) {
+            markFieldError(name);
+            isValid = false;
+        }
+        if (uname.getText().trim().isEmpty()) {
+            markFieldError(uname);
+            isValid = false;
+        }
+        if (email.getText().trim().isEmpty()) {
+            markFieldError(email);
+            isValid = false;
+        }
+        if (pass.getText().trim().isEmpty()) {
+            markFieldError(pass);
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    private void markFieldError(JTextField field) {
+        if (firstInvalidField == null) {
+            firstInvalidField = field;
+        }
+        field.setBorder(errorTextFieldBorder);
+        field.setBackground(errorTextFieldBackground);
+        field.setForeground(new Color(160, 32, 48));
+        field.revalidate();
+        field.repaint();
+    }
+
+    private void styleTextField(JTextField field) {
+        field.setBackground(defaultTextFieldBackground);
+        field.setForeground(new Color(42, 48, 66));
+        field.setCaretColor(new Color(80, 56, 190));
+        field.setBorder(defaultTextFieldBorder);
+        field.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        field.setEditable(true);
+        field.setEnabled(true);
+        field.setFocusable(true);
+        field.setMargin(new Insets(4, 8, 4, 8));
+        field.setSelectionColor(new Color(196, 180, 255));
+        field.setSelectedTextColor(new Color(32, 24, 68));
+    }
+
+    private void styleActionButton(javax.swing.JPanel panel, javax.swing.JLabel label) {
+        final Font originalFont = label.getFont();
+        final Color baseColor = panel.getBackground();
+        panel.setBorder(BorderFactory.createEmptyBorder());
+        panel.setOpaque(false);
+        panel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setForeground(Color.WHITE);
+        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        label.setOpaque(false);
+
+        final javax.swing.JLabel backgroundLabel = new javax.swing.JLabel();
+        backgroundLabel.setBounds(0, 0, Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()));
+        panel.add(backgroundLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        panel.setComponentZOrder(backgroundLabel, panel.getComponentCount() - 1);
+        panel.setComponentZOrder(label, 0);
+        label.setBounds(0, 0, Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()));
+
+        panel.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                backgroundLabel.setBounds(0, 0, panel.getWidth(), panel.getHeight());
+                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, false)));
+                label.setBounds(0, 0, panel.getWidth(), panel.getHeight());
+                fitLabelText(label, originalFont, panel.getWidth() - 16);
+            }
+        });
+
+        panel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, true)));
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, false)));
+            }
+        });
+
+        backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(
+                Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()), baseColor, false
+        )));
+        fitLabelText(label, originalFont, Math.max(1, panel.getWidth() - 16));
+    }
+
+    private void fitLabelText(javax.swing.JLabel label, Font baseFont, int maxWidth) {
+        int targetSize = baseFont.getSize();
+        while (targetSize > 11) {
+            Font testFont = new Font(baseFont.getName(), baseFont.getStyle(), targetSize);
+            int textWidth = label.getFontMetrics(testFont).stringWidth(label.getText().trim());
+            if (textWidth <= maxWidth) {
+                label.setFont(testFont);
+                return;
+            }
+            targetSize--;
+        }
+        label.setFont(new Font(baseFont.getName(), baseFont.getStyle(), 11));
+    }
+
+    private BufferedImage createGlossyButtonImage(int width, int height, Color baseColor, boolean hover) {
+        int w = Math.max(width, 1);
+        int h = Math.max(height, 1);
+        BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        Color outer = hover ? adjustColor(baseColor, 55) : adjustColor(baseColor, 35);
+        Color top = hover ? adjustColor(baseColor, 22) : adjustColor(baseColor, 8);
+        Color bottom = hover ? adjustColor(baseColor, -12) : adjustColor(baseColor, -24);
+        Color shineTop = new Color(255, 255, 255, hover ? 180 : 165);
+        Color shineBottom = new Color(255, 255, 255, 20);
+
+        int arc = h - 2;
+        g2.setColor(outer);
+        g2.fillRoundRect(0, 0, w - 1, h - 1, arc, arc);
+
+        g2.setPaint(new java.awt.GradientPaint(0, 2, top, 0, h - 3, bottom));
+        g2.fillRoundRect(3, 3, w - 6, h - 6, Math.max(10, arc - 6), Math.max(10, arc - 6));
+
+        g2.setPaint(new java.awt.GradientPaint(0, 5, shineTop, 0, h / 2, shineBottom));
+        g2.fillRoundRect(12, 5, Math.max(1, w - 24), Math.max(8, (h / 2) - 3), Math.max(8, arc - 18), Math.max(8, arc - 18));
+
+        g2.setColor(new Color(255, 255, 255, 170));
+        g2.drawRoundRect(1, 1, w - 3, h - 3, arc, arc);
+        g2.dispose();
+        return image;
+    }
+
+    private Color adjustColor(Color color, int amount) {
+        int red = Math.max(0, Math.min(255, color.getRed() + amount));
+        int green = Math.max(0, Math.min(255, color.getGreen() + amount));
+        int blue = Math.max(0, Math.min(255, color.getBlue() + amount));
+        return new Color(red, green, blue);
+    }
 }

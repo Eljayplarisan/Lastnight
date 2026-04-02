@@ -67,6 +67,7 @@ public class Admin extends javax.swing.JFrame {
     }
 
     private void styleActionButton(JPanel panel, JLabel label) {
+        final Font originalFont = label.getFont();
         panel.setBorder(BorderFactory.createEmptyBorder());
         panel.setOpaque(false);
         panel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -91,7 +92,7 @@ public class Admin extends javax.swing.JFrame {
                 backgroundLabel.setBounds(0, 0, panel.getWidth(), panel.getHeight());
                 backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), false)));
                 label.setBounds(0, 0, panel.getWidth(), panel.getHeight());
-                fitLabelText(label, panel.getWidth() - 16);
+                fitLabelText(label, originalFont, panel.getWidth() - 16);
             }
         });
 
@@ -110,11 +111,10 @@ public class Admin extends javax.swing.JFrame {
         backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(
                 Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()), false
         )));
-        fitLabelText(label, Math.max(1, panel.getWidth() - 16));
+        fitLabelText(label, originalFont, Math.max(1, panel.getWidth() - 16));
     }
 
-    private void fitLabelText(JLabel label, int maxWidth) {
-        Font baseFont = label.getFont();
+    private void fitLabelText(JLabel label, Font baseFont, int maxWidth) {
         int targetSize = baseFont.getSize();
         while (targetSize > 11) {
             Font testFont = new Font(baseFont.getName(), baseFont.getStyle(), targetSize);
