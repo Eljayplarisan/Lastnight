@@ -11,10 +11,20 @@ import Admin.Viewbook;
 import Main.login;
 import config.Session;
 import config.config;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 /**
  *
@@ -27,6 +37,10 @@ public class Staff extends javax.swing.JFrame {
      */
     public Staff() {
         initComponents();
+        styleActionButton(books, jLabel2);
+        styleActionButton(View, viewboks);
+        styleActionButton(del, DEL);
+        styleActionButton(jPanel6, jLabel5);
         loadUserProfile();
         
          if (!Session.isLoggedIn()) {
@@ -62,6 +76,97 @@ public class Staff extends javax.swing.JFrame {
         e.printStackTrace(); // Check console for errors
     }
 }
+
+    private void styleActionButton(JPanel panel, JLabel label) {
+        panel.setBorder(BorderFactory.createEmptyBorder());
+        panel.setOpaque(false);
+        panel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setForeground(Color.WHITE);
+        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        label.setOpaque(false);
+
+        final JLabel backgroundLabel = new JLabel();
+        backgroundLabel.setBounds(0, 0, Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()));
+        panel.add(backgroundLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        panel.setComponentZOrder(backgroundLabel, panel.getComponentCount() - 1);
+        panel.setComponentZOrder(label, 0);
+        label.setBounds(0, 0, Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()));
+
+        panel.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                backgroundLabel.setBounds(0, 0, panel.getWidth(), panel.getHeight());
+                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), false)));
+                label.setBounds(0, 0, panel.getWidth(), panel.getHeight());
+                fitLabelText(label, panel.getWidth() - 16);
+            }
+        });
+
+        panel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), true)));
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), false)));
+            }
+        });
+
+        backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(
+                Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()), false
+        )));
+        fitLabelText(label, Math.max(1, panel.getWidth() - 16));
+    }
+
+    private void fitLabelText(JLabel label, int maxWidth) {
+        Font baseFont = label.getFont();
+        int targetSize = baseFont.getSize();
+        while (targetSize > 11) {
+            Font testFont = new Font(baseFont.getName(), baseFont.getStyle(), targetSize);
+            int textWidth = label.getFontMetrics(testFont).stringWidth(label.getText());
+            if (textWidth <= maxWidth) {
+                label.setFont(testFont);
+                return;
+            }
+            targetSize--;
+        }
+        label.setFont(new Font(baseFont.getName(), baseFont.getStyle(), 11));
+    }
+
+    private BufferedImage createGlossyButtonImage(int width, int height, boolean hover) {
+        int w = Math.max(width, 1);
+        int h = Math.max(height, 1);
+        BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        Color outer = hover ? new Color(227, 231, 239) : new Color(210, 214, 224);
+        Color top = hover ? new Color(187, 74, 255) : new Color(164, 43, 248);
+        Color bottom = hover ? new Color(104, 0, 232) : new Color(91, 0, 215);
+        Color shineTop = new Color(255, 255, 255, hover ? 180 : 165);
+        Color shineBottom = new Color(255, 255, 255, 20);
+
+        int arc = h - 2;
+        g2.setColor(outer);
+        g2.fillRoundRect(0, 0, w - 1, h - 1, arc, arc);
+
+        g2.setPaint(new java.awt.GradientPaint(0, 2, top, 0, h - 3, bottom));
+        g2.fillRoundRect(3, 3, w - 6, h - 6, Math.max(10, arc - 6), Math.max(10, arc - 6));
+
+        g2.setPaint(new java.awt.GradientPaint(0, 5, shineTop, 0, h / 2, shineBottom));
+        g2.fillRoundRect(12, 5, Math.max(1, w - 24), Math.max(8, (h / 2) - 3), Math.max(8, arc - 18), Math.max(8, arc - 18));
+
+        g2.setColor(new Color(255, 255, 255, 170));
+        g2.drawRoundRect(1, 1, w - 3, h - 3, arc, arc);
+        g2.dispose();
+        return image;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
