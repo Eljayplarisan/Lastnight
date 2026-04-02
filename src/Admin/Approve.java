@@ -24,7 +24,7 @@ public class Approve extends javax.swing.JFrame {
 
     public Approve() {
         initComponents();
-        styleActionButton(approvePanel, approveLabel, new Color(54, 153, 73));
+        styleActionButton(approvePanel, approveLabel, new Color(30, 95, 95));
         getData();
         
         if (!Session.isLoggedIn()) {
@@ -86,7 +86,7 @@ public class Approve extends javax.swing.JFrame {
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 20, 450, 320));
 
-        approvePanel.setBackground(new java.awt.Color(54, 153, 73));
+        approvePanel.setBackground(new java.awt.Color(30, 95, 95));
         approvePanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         approvePanel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
