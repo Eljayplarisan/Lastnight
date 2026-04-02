@@ -87,6 +87,11 @@ public class Books extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        book_table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                book_tableMouseClicked(evt);
+            }
+        });
         btable.setViewportView(book_table);
 
         getContentPane().add(btable, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 60, 360, 280));
@@ -165,6 +170,10 @@ public class Books extends javax.swing.JFrame {
        ua.setVisible(true);
        this.dispose();// TODO add your handling code here:
     }//GEN-LAST:event_backMouseClicked
+
+    private void book_tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_book_tableMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_book_tableMouseClicked
 
     /**
      * @param args the command line arguments

@@ -223,6 +223,11 @@ public class Admin extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Add Books");
+        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel1MouseClicked(evt);
+            }
+        });
         addbooks.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 4, 90, 20));
 
         jPanel7.add(addbooks, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 60, 130, 30));
@@ -336,6 +341,12 @@ public class Admin extends javax.swing.JFrame {
         vb.setVisible(true);
         this.dispose();// TODO add your handling code here:
     }//GEN-LAST:event_bookMouseClicked
+
+    private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
+       Books bk = new Books();
+       bk.setVisible(true);
+       this.dispose();
+    }//GEN-LAST:event_jLabel1MouseClicked
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

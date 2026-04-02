@@ -90,14 +90,14 @@ public class Staff extends javax.swing.JFrame {
         lbEmail = new javax.swing.JLabel();
         LBName = new javax.swing.JLabel();
         LBEmail = new javax.swing.JLabel();
-        addbooks = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
         del = new javax.swing.JPanel();
         Delte = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         view = new javax.swing.JPanel();
         book = new javax.swing.JLabel();
+        books = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -131,22 +131,6 @@ public class Staff extends javax.swing.JFrame {
         LBEmail.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         LBEmail.setForeground(new java.awt.Color(255, 255, 255));
         jPanel1.add(LBEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 160, 120, 30));
-
-        addbooks.setBackground(new java.awt.Color(73, 105, 164));
-        addbooks.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        addbooks.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                addbooksMouseClicked(evt);
-            }
-        });
-        addbooks.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setText("Add Books");
-        addbooks.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 4, 90, 20));
-
-        jPanel1.add(addbooks, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 60, 130, 30));
 
         del.setBackground(new java.awt.Color(73, 105, 164));
         del.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -202,6 +186,27 @@ public class Staff extends javax.swing.JFrame {
 
         jPanel1.add(view, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 100, 130, 30));
 
+        books.setBackground(new java.awt.Color(73, 105, 164));
+        books.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        books.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                booksMouseClicked(evt);
+            }
+        });
+        books.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("Add Books");
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+        });
+        books.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 0, -1, 30));
+
+        jPanel1.add(books, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 60, 130, 30));
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/fan.jpg"))); // NOI18N
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
@@ -210,12 +215,6 @@ public class Staff extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void addbooksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addbooksMouseClicked
-        Books bk = new Books();
-        bk.setVisible(true);
-        this.dispose();// TODO add your handling code here:
-    }//GEN-LAST:event_addbooksMouseClicked
 
     private void bookMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bookMouseClicked
         Viewbook vb = new Viewbook();
@@ -238,6 +237,18 @@ public class Staff extends javax.swing.JFrame {
         log.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jPanel6MouseClicked
+
+    private void booksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_booksMouseClicked
+      addbooks adbks = new addbooks();
+      adbks.setVisible(true);
+      this.dispose();
+    }//GEN-LAST:event_booksMouseClicked
+
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+      addbooks adbks = new addbooks();
+      adbks.setVisible(true);
+      this.dispose();
+    }//GEN-LAST:event_jLabel2MouseClicked
 
     /**
      * @param args the command line arguments
@@ -278,8 +289,8 @@ public class Staff extends javax.swing.JFrame {
     private javax.swing.JLabel Delte;
     private javax.swing.JLabel LBEmail;
     private javax.swing.JLabel LBName;
-    private javax.swing.JPanel addbooks;
     private javax.swing.JLabel book;
+    private javax.swing.JPanel books;
     private javax.swing.JLabel dashb;
     private javax.swing.JPanel del;
     private javax.swing.JLabel jLabel1;

@@ -5,7 +5,10 @@
  */
 package Staff;
 
+import Main.login;
+import config.Session;
 import config.config;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -18,6 +21,20 @@ public class addbooks extends javax.swing.JFrame {
      */
     public addbooks() {
         initComponents();
+        if (!Session.isLoggedIn()) {
+        JOptionPane.showMessageDialog(this, "You must login first!");
+        login log = new login();
+        log.setVisible(true);
+        this.dispose();
+        }
+        
+        getData();
+    }
+    
+     void getData(){
+        config con = new config();
+        String sql = "SELECT * FROM tbl_books";
+        con.displayData(sql, table);
     }
 
     /**
@@ -29,26 +46,35 @@ public class addbooks extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        btable = new javax.swing.JScrollPane();
-        book_table = new javax.swing.JTable();
-        add = new javax.swing.JPanel();
-        addbks = new javax.swing.JLabel();
-        b_author = new javax.swing.JLabel();
-        b_title = new javax.swing.JLabel();
-        back = new javax.swing.JLabel();
-        booktitle = new javax.swing.JTextField();
-        author = new javax.swing.JTextField();
-        b_publsher = new javax.swing.JLabel();
-        b_publsher1 = new javax.swing.JLabel();
-        b_publish = new javax.swing.JLabel();
-        Publisher = new javax.swing.JTextField();
-        yearpub = new javax.swing.JTextField();
+        bck = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        bkttle = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        table = new javax.swing.JTable();
+        btitle = new javax.swing.JLabel();
+        BA = new javax.swing.JLabel();
+        Bp = new javax.swing.JLabel();
+        bps = new javax.swing.JLabel();
         Frame = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        book_table.setModel(new javax.swing.table.DefaultTableModel(
+        bck.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png"))); // NOI18N
+        bck.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                bckMouseClicked(evt);
+            }
+        });
+        getContentPane().add(bck, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, 50, 50));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 180, 90, 20));
+        getContentPane().add(bkttle, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 90, 20));
+        getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 110, 90, 20));
+        getContentPane().add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 90, 20));
+
+        table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -59,99 +85,42 @@ public class addbooks extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        btable.setViewportView(book_table);
+        jScrollPane1.setViewportView(table);
 
-        getContentPane().add(btable, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 60, 360, 280));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 60, 360, 280));
 
-        add.setBackground(new java.awt.Color(30, 95, 95));
-        add.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        add.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                addMouseClicked(evt);
-            }
-        });
-        add.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        btitle.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        btitle.setForeground(new java.awt.Color(255, 255, 255));
+        btitle.setText("Book Title :");
+        getContentPane().add(btitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, 90, -1));
 
-        addbks.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        addbks.setForeground(new java.awt.Color(255, 255, 255));
-        addbks.setText("Add books");
-        addbks.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                addbksMouseClicked(evt);
-            }
-        });
-        add.add(addbks, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 100, 30));
+        BA.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        BA.setForeground(new java.awt.Color(255, 255, 255));
+        BA.setText("Book Author :");
+        getContentPane().add(BA, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 90, -1, -1));
 
-        getContentPane().add(add, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 120, 30));
+        Bp.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        Bp.setForeground(new java.awt.Color(255, 255, 255));
+        Bp.setText("Book Publisher :");
+        getContentPane().add(Bp, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, -1, -1));
 
-        b_author.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        b_author.setForeground(new java.awt.Color(255, 255, 255));
-        b_author.setText("Book Author :");
-        getContentPane().add(b_author, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 90, -1, -1));
-
-        b_title.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        b_title.setForeground(new java.awt.Color(255, 255, 255));
-        b_title.setText("Book Title :");
-        getContentPane().add(b_title, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, -1, -1));
-
-        back.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png"))); // NOI18N
-        back.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                backMouseClicked(evt);
-            }
-        });
-        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, 50, 50));
-
-        booktitle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                booktitleActionPerformed(evt);
-            }
-        });
-        getContentPane().add(booktitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 90, -1));
-        getContentPane().add(author, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 110, 90, -1));
-
-        b_publsher.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        b_publsher.setForeground(new java.awt.Color(255, 255, 255));
-        b_publsher.setText("Book Publisher :");
-        getContentPane().add(b_publsher, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, -1, -1));
-
-        b_publsher1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        b_publsher1.setForeground(new java.awt.Color(255, 255, 255));
-        b_publsher1.setText("Book Publisher :");
-        getContentPane().add(b_publsher1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, -1, -1));
-
-        b_publish.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        b_publish.setForeground(new java.awt.Color(255, 255, 255));
-        b_publish.setText("Book Publish :");
-        getContentPane().add(b_publish, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 160, -1, -1));
-        getContentPane().add(Publisher, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 90, -1));
-        getContentPane().add(yearpub, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 180, 90, -1));
+        bps.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        bps.setForeground(new java.awt.Color(255, 255, 255));
+        bps.setText("Book Publish :");
+        getContentPane().add(bps, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 160, -1, -1));
 
         Frame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/ima.jpg"))); // NOI18N
         getContentPane().add(Frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 360));
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void booktitleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_booktitleActionPerformed
-
-    }//GEN-LAST:event_booktitleActionPerformed
-
-    private void addbksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addbksMouseClicked
-        config con = new config();
-        String sql = "INSERT INTO tbl_books (b_title, b_author, b_publisher, b_publish) VALUES (?, ?, ?, ?)";
-        con.addRecord(sql, booktitle.getText(), author.getText(), Publisher.getText(), yearpub.getText());
-    }//GEN-LAST:event_addbksMouseClicked
-
-    private void addMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addMouseClicked
-
-    }//GEN-LAST:event_addMouseClicked
-
-    private void backMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_backMouseClicked
-        Staff ua = new Staff();
-        ua.setVisible(true);
-        this.dispose();// TODO add your handling code here:
-    }//GEN-LAST:event_backMouseClicked
+    private void bckMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bckMouseClicked
+      Staff stff = new Staff();
+      stff.setVisible(true);
+      this.dispose();
+    }//GEN-LAST:event_bckMouseClicked
 
     /**
      * @param args the command line arguments
@@ -189,20 +158,17 @@ public class addbooks extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel BA;
+    private javax.swing.JLabel Bp;
     private javax.swing.JLabel Frame;
-    private javax.swing.JTextField Publisher;
-    private javax.swing.JPanel add;
-    private javax.swing.JLabel addbks;
-    private javax.swing.JTextField author;
-    private javax.swing.JLabel b_author;
-    private javax.swing.JLabel b_publish;
-    private javax.swing.JLabel b_publsher;
-    private javax.swing.JLabel b_publsher1;
-    private javax.swing.JLabel b_title;
-    private javax.swing.JLabel back;
-    private javax.swing.JTable book_table;
-    private javax.swing.JTextField booktitle;
-    private javax.swing.JScrollPane btable;
-    private javax.swing.JTextField yearpub;
+    private javax.swing.JLabel bck;
+    private javax.swing.JPanel bkttle;
+    private javax.swing.JLabel bps;
+    private javax.swing.JLabel btitle;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
 }
