@@ -27,6 +27,7 @@ public class Staff extends javax.swing.JFrame {
      */
     public Staff() {
         initComponents();
+        loadUserProfile();
         
          if (!Session.isLoggedIn()) {
         JOptionPane.showMessageDialog(this, "You must login first!");
@@ -35,18 +36,6 @@ public class Staff extends javax.swing.JFrame {
         this.dispose();
         }
     }
-    
-    public void Staff() {
-    initComponents();
-    loadUserProfile();  // ADD THIS LINE
-    
-    if (!Session.isLoggedIn()) {
-        JOptionPane.showMessageDialog(this, "You must login first!");
-        login log = new login();
-        log.setVisible(true);
-        this.dispose();
-    }
-}
     
     private void loadUserProfile() {
     String sql = "SELECT u_fname, u_email, u_role FROM tbl_data WHERE u_uname = ?";

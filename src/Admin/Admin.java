@@ -108,7 +108,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(LBName, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 120, 100, 30));
 
         jPanel6.setBackground(new java.awt.Color(73, 105, 164));
-        jPanel6.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel6.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         jPanel6.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jPanel6MouseClicked(evt);
@@ -124,7 +124,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 310, 120, 30));
 
         updte.setBackground(new java.awt.Color(73, 105, 164));
-        updte.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        updte.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         updte.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 updteMouseClicked(evt);
@@ -146,7 +146,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(updte, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 140, 130, 30));
 
         User.setBackground(new java.awt.Color(73, 105, 164));
-        User.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        User.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         User.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 UserMouseClicked(evt);
@@ -167,7 +167,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(User, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 100, 130, 30));
 
         dashboard.setBackground(new java.awt.Color(73, 105, 164));
-        dashboard.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        dashboard.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         dashboard.setForeground(new java.awt.Color(255, 255, 255));
         dashboard.setAlignmentY(2.2F);
         dashboard.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -190,7 +190,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(dashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 60, 130, 30));
 
         del.setBackground(new java.awt.Color(73, 105, 164));
-        del.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        del.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         del.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 delMouseClicked(evt);
@@ -212,7 +212,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(del, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 180, 130, 30));
 
         addbooks.setBackground(new java.awt.Color(73, 105, 164));
-        addbooks.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        addbooks.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         addbooks.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 addbooksMouseClicked(evt);
@@ -233,7 +233,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(addbooks, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 60, 130, 30));
 
         list.setBackground(new java.awt.Color(73, 105, 164));
-        list.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        list.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         list.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         transac.setBackground(new java.awt.Color(73, 105, 164));
@@ -250,7 +250,7 @@ public class Admin extends javax.swing.JFrame {
         jPanel7.add(list, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 140, 130, 30));
 
         view.setBackground(new java.awt.Color(73, 105, 164));
-        view.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        view.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         view.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         book.setFont(new java.awt.Font("Tahoma", 1, 15)); // NOI18N

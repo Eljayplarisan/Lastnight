@@ -9,6 +9,10 @@ import Admin.admimUser;
 import Main.login;
 import User.userProfile;
 import config.Session;
+import config.config;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import javax.swing.JOptionPane;
 
 /**
@@ -22,6 +26,7 @@ public class userDashboard extends javax.swing.JFrame {
      */
     public userDashboard() {
         initComponents();
+        loadUserProfile();
         
         
     if (!Session.isLoggedIn()) {
@@ -29,6 +34,26 @@ public class userDashboard extends javax.swing.JFrame {
         login log = new login();
         log.setVisible(true);
         this.dispose();
+        }
+    }
+
+    private void loadUserProfile() {
+        String sql = "SELECT u_fname, u_email FROM tbl_data WHERE u_uname = ?";
+        try (Connection conn = config.connectDB();
+             PreparedStatement pst = conn.prepareStatement(sql)) {
+
+            pst.setString(1, Session.getUsername());
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                LBName.setText(rs.getString("u_fname"));
+                LBEmail.setText(rs.getString("u_email"));
+            } else {
+                JOptionPane.showMessageDialog(this, "User not found!");
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading profile: " + e.getMessage());
         }
     }
     
