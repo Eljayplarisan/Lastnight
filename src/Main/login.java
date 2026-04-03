@@ -11,12 +11,23 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 
 
 public class login extends javax.swing.JFrame {
 
     public login() {
         initComponents();
+        stylePasswordField();
+    }
+
+    private void stylePasswordField() {
+        ps.setBackground(em.getBackground());
+        ps.setForeground(em.getForeground());
+        ps.setCaretColor(em.getForeground());
+        ps.setFont(em.getFont());
+        ps.setBorder(em.getBorder());
+        ps.setEchoChar('\u2022');
     }
 
     @SuppressWarnings("unchecked")
@@ -24,7 +35,7 @@ public class login extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        ps = new javax.swing.JTextField();
+        ps = new javax.swing.JPasswordField();
         em = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -34,6 +45,7 @@ public class login extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        showPassword = new javax.swing.JCheckBox();
         jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -48,7 +60,7 @@ public class login extends javax.swing.JFrame {
                 psActionPerformed(evt);
             }
         });
-        jPanel1.add(ps, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 130, 30));
+        jPanel1.add(ps, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 170, 130, 30));
 
         em.setToolTipText("");
         em.addActionListener(new java.awt.event.ActionListener() {
@@ -56,7 +68,7 @@ public class login extends javax.swing.JFrame {
                 emActionPerformed(evt);
             }
         });
-        jPanel1.add(em, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 170, 130, 30));
+        jPanel1.add(em, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 130, 30));
 
         jLabel3.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -75,7 +87,7 @@ public class login extends javax.swing.JFrame {
                 loginBtn1ActionPerformed(evt);
             }
         });
-        jPanel1.add(loginBtn1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 220, 90, 30));
+        jPanel1.add(loginBtn1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 240, 90, 30));
 
         loginBtn.setFont(new java.awt.Font("Tahoma", 0, 15)); // NOI18N
         loginBtn.setText("Login");
@@ -84,7 +96,7 @@ public class login extends javax.swing.JFrame {
                 loginBtnActionPerformed(evt);
             }
         });
-        jPanel1.add(loginBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 220, 90, 30));
+        jPanel1.add(loginBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 240, 90, 30));
 
         jLabel6.setFont(new java.awt.Font("Times New Roman", 0, 16)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
@@ -106,10 +118,21 @@ public class login extends javax.swing.JFrame {
         jLabel2.setText("What story will find you today?");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 70, 270, 30));
 
-        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/nn.jpg"))); // NOI18N
-        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 540, 350));
+        showPassword.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        showPassword.setForeground(new java.awt.Color(255, 255, 255));
+        showPassword.setText("Show Password");
+        showPassword.setContentAreaFilled(false);
+        showPassword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showPasswordActionPerformed(evt);
+            }
+        });
+        jPanel1.add(showPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 210, 140, 20));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 540, 350));
+        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/nn.jpg"))); // NOI18N
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 540, 360));
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 540, 360));
 
         pack();
         setLocationRelativeTo(null);
@@ -126,13 +149,13 @@ public class login extends javax.swing.JFrame {
 
     private void loginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginBtnActionPerformed
        
-    if (em.getText().trim().isEmpty() || ps.getText().trim().isEmpty()) {
+    if (em.getText().trim().isEmpty() || new String(ps.getPassword()).trim().isEmpty()) {
         JOptionPane.showMessageDialog(this, "Please enter Email and Password!");
         return;
     }
 
     String email = em.getText().trim();
-    String password = ps.getText().trim();
+    String password = new String(ps.getPassword()).trim();
 
     config con = new config();
 
@@ -202,6 +225,10 @@ public class login extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_emActionPerformed
 
+    private void showPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showPasswordActionPerformed
+        ps.setEchoChar(showPassword.isSelected() ? (char) 0 : '\u2022');
+    }//GEN-LAST:event_showPasswordActionPerformed
+
     
     private String getUsernameByEmail(String email) {
         String username = null;
@@ -266,6 +293,7 @@ public class login extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton loginBtn;
     private javax.swing.JButton loginBtn1;
-    private javax.swing.JTextField ps;
+    private javax.swing.JPasswordField ps;
+    private javax.swing.JCheckBox showPassword;
     // End of variables declaration//GEN-END:variables
 }

@@ -109,7 +109,7 @@ public class viewbooks extends javax.swing.JFrame {
         booksGrid.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
         galleryScroll.setViewportView(booksGrid);
 
-        getContentPane().add(galleryScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(156, 8, 384, 342));
+        getContentPane().add(galleryScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 8, 416, 342));
 
         deletePanel.setBackground(new java.awt.Color(30, 95, 95));
         deletePanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -130,7 +130,7 @@ public class viewbooks extends javax.swing.JFrame {
         });
         deletePanel.add(deleteLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 30));
 
-        getContentPane().add(deletePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 214, 120, 30));
+        getContentPane().add(deletePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 200, 118, 30));
 
         bck.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png")));
         bck.addMouseListener(new java.awt.event.MouseAdapter() {

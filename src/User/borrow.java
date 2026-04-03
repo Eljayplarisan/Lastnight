@@ -107,7 +107,12 @@ public class borrow extends javax.swing.JFrame {
                      "COALESCE(br.book_image, b.b_image, '') AS b_image, " +
                      "br.U_name, br.U_email, " +
                      "CASE WHEN COALESCE(br.borrow_date, '') = '' THEN '' ELSE strftime('%m/%d/%Y', br.borrow_date) END AS borrow_day, " +
-                     "CASE WHEN COALESCE(br.borrow_date, '') = '' THEN '' ELSE strftime('%I:%M %p', br.borrow_date) END AS borrow_time " +
+                     "CASE WHEN COALESCE(br.borrow_date, '') = '' THEN '' " +
+                     "ELSE printf('%d:%s %s', " +
+                     "CASE CAST(strftime('%H', br.borrow_date) AS INTEGER) % 12 " +
+                     "WHEN 0 THEN 12 ELSE CAST(strftime('%H', br.borrow_date) AS INTEGER) % 12 END, " +
+                     "strftime('%M', br.borrow_date), " +
+                     "CASE WHEN CAST(strftime('%H', br.borrow_date) AS INTEGER) >= 12 THEN 'PM' ELSE 'AM' END) END AS borrow_time " +
                      "FROM tbl_borrower br " +
                      "LEFT JOIN tbl_books b ON b.b_id = br.book_id " +
                      "WHERE COALESCE(br.status, '') = 'Borrowed' " +
@@ -156,7 +161,7 @@ public class borrow extends javax.swing.JFrame {
 
         booksGrid.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
         galleryScroll.setViewportView(booksGrid);
-        getContentPane().add(galleryScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(148, 8, 392, 342));
+        getContentPane().add(galleryScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 8, 416, 342));
 
         deletePanel.setBackground(new java.awt.Color(30, 95, 95));
         deletePanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -177,7 +182,7 @@ public class borrow extends javax.swing.JFrame {
         });
         deletePanel.add(deleteLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 30));
 
-        getContentPane().add(deletePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(18, 214, 120, 30));
+        getContentPane().add(deletePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 200, 118, 30));
 
         back.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png")));
         back.addMouseListener(new java.awt.event.MouseAdapter() {

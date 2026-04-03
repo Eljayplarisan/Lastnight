@@ -14,23 +14,38 @@ import config.config;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.geom.Ellipse2D;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.UUID;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
  * @author Nino
  */
 public class Staff extends javax.swing.JFrame {
+    private static final String PROFILE_FOLDER = "profile_images";
 
     /**
      * Creates new form Staff
@@ -41,6 +56,15 @@ public class Staff extends javax.swing.JFrame {
         styleActionButton(View, viewboks);
         styleActionButton(del, DEL);
         styleActionButton(jPanel6, jLabel5);
+        ensureProfileImageColumn();
+        profile.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        profile.setToolTipText("Click to update profile");
+        profile.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                openProfileEditor();
+            }
+        });
         loadUserProfile();
         
          if (!Session.isLoggedIn()) {
@@ -52,7 +76,7 @@ public class Staff extends javax.swing.JFrame {
     }
     
     private void loadUserProfile() {
-    String sql = "SELECT u_fname, u_email, u_role FROM tbl_data WHERE u_uname = ?";
+    String sql = "SELECT u_fname, u_email, u_role, COALESCE(u_image, '') AS u_image FROM tbl_data WHERE u_uname = ?";
     try (Connection conn = config.connectDB();
          PreparedStatement pst = conn.prepareStatement(sql)) {
 
@@ -65,8 +89,7 @@ public class Staff extends javax.swing.JFrame {
             
             LBName.setText(fname != null ? fname : "N/A");
             LBEmail.setText(email != null ? email : "N/A");
-            
-            System.out.println("Profile loaded: " + fname + " | " + email); // Debug
+            loadProfileImage(rs.getString("u_image"));
         } else {
             JOptionPane.showMessageDialog(this, "User not found!");
         }
@@ -76,6 +99,184 @@ public class Staff extends javax.swing.JFrame {
         e.printStackTrace(); // Check console for errors
     }
 }
+
+    private void ensureProfileImageColumn() {
+        try (Connection conn = config.connectDB();
+             PreparedStatement pst = conn.prepareStatement("ALTER TABLE tbl_data ADD COLUMN u_image TEXT")) {
+            pst.executeUpdate();
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void openProfileEditor() {
+        String[] profileData = getCurrentProfileData();
+        if (profileData == null) {
+            JOptionPane.showMessageDialog(this, "Unable to load profile details right now.");
+            return;
+        }
+
+        JTextField nameField = new JTextField(profileData[0], 16);
+        JTextField emailField = new JTextField(profileData[1], 16);
+        JPasswordField passwordField = new JPasswordField(profileData[3], 16);
+        JCheckBox showPassword = new JCheckBox("Show Password");
+        JButton chooseImageButton = new JButton("Choose Picture");
+        JLabel imageName = new JLabel(profileData[2].isEmpty() ? "Current: Default profile" : "Current: Saved picture");
+        final String[] selectedImagePath = { profileData[2] };
+
+        showPassword.setOpaque(false);
+        showPassword.addActionListener(evt -> passwordField.setEchoChar(showPassword.isSelected() ? (char) 0 : '\u2022'));
+        passwordField.setEchoChar('\u2022');
+
+        chooseImageButton.addActionListener(evt -> {
+            String chosen = chooseProfileImage();
+            if (chosen != null) {
+                selectedImagePath[0] = chosen;
+                imageName.setText("Selected: " + new File(chosen).getName());
+            }
+        });
+
+        JPanel panel = new JPanel(new GridLayout(0, 1, 6, 6));
+        panel.add(new JLabel("Name"));
+        panel.add(nameField);
+        panel.add(new JLabel("Email"));
+        panel.add(emailField);
+        panel.add(new JLabel("Password"));
+        panel.add(passwordField);
+        panel.add(showPassword);
+        panel.add(chooseImageButton);
+        panel.add(imageName);
+
+        int option = JOptionPane.showConfirmDialog(this, panel, "Update Staff Profile", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (option != JOptionPane.OK_OPTION) {
+            return;
+        }
+
+        String newName = nameField.getText().trim();
+        String newEmail = emailField.getText().trim();
+        String newPassword = new String(passwordField.getPassword()).trim();
+        if (newName.isEmpty() || newEmail.isEmpty() || newPassword.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please complete the name, email, and password fields.");
+            return;
+        }
+
+        String storedImagePath = selectedImagePath[0];
+        if (storedImagePath != null && !storedImagePath.trim().isEmpty() && !storedImagePath.equals(profileData[2])) {
+            storedImagePath = saveProfileImage(storedImagePath);
+        }
+
+        try (Connection conn = config.connectDB();
+             PreparedStatement pst = conn.prepareStatement(
+                     "UPDATE tbl_data SET u_fname = ?, u_email = ?, u_password = ?, u_image = ? WHERE u_uname = ?")) {
+            pst.setString(1, newName);
+            pst.setString(2, newEmail);
+            pst.setString(3, newPassword);
+            pst.setString(4, storedImagePath == null ? profileData[2] : storedImagePath);
+            pst.setString(5, Session.getUsername());
+            pst.executeUpdate();
+            JOptionPane.showMessageDialog(this, "Profile updated successfully.");
+            loadUserProfile();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Unable to update profile: " + e.getMessage());
+        }
+    }
+
+    private String[] getCurrentProfileData() {
+        String sql = "SELECT u_fname, u_email, COALESCE(u_image, '') AS u_image, COALESCE(u_password, '') AS u_password FROM tbl_data WHERE u_uname = ?";
+        try (Connection conn = config.connectDB();
+             PreparedStatement pst = conn.prepareStatement(sql)) {
+            pst.setString(1, Session.getUsername());
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return new String[] {
+                        rs.getString("u_fname"),
+                        rs.getString("u_email"),
+                        rs.getString("u_image"),
+                        rs.getString("u_password")
+                    };
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Unable to read profile: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private String chooseProfileImage() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "gif", "bmp", "webp"));
+        return chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION
+                ? chooser.getSelectedFile().getAbsolutePath()
+                : null;
+    }
+
+    private String saveProfileImage(String sourcePath) {
+        try {
+            Path targetDir = new File(PROFILE_FOLDER).toPath();
+            Files.createDirectories(targetDir);
+            String extension = getFileExtension(sourcePath);
+            Path targetPath = targetDir.resolve("profile_" + UUID.randomUUID() + extension);
+            Files.copy(new File(sourcePath).toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+            return targetPath.toString();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Unable to save selected profile image: " + e.getMessage());
+            return sourcePath;
+        }
+    }
+
+    private void loadProfileImage(String imagePath) {
+        ImageIcon defaultIcon = new javax.swing.ImageIcon(getClass().getResource("/Photo/profile.png"));
+        if (imagePath == null || imagePath.trim().isEmpty()) {
+            profile.setIcon(scaleProfileIcon(defaultIcon));
+            return;
+        }
+        File file = new File(imagePath);
+        if (!file.exists()) {
+            profile.setIcon(scaleProfileIcon(defaultIcon));
+            return;
+        }
+        profile.setIcon(scaleProfileIcon(new ImageIcon(imagePath)));
+    }
+
+    private ImageIcon scaleProfileIcon(ImageIcon icon) {
+        int width = 120;
+        int height = 90;
+        int circleSize = 74;
+        int x = 18;
+        int y = 8;
+
+        BufferedImage canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = canvas.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.setColor(new Color(255, 211, 163));
+        g2.fillOval(x - 4, y - 4, circleSize + 8, circleSize + 8);
+        g2.setColor(new Color(18, 90, 112));
+        g2.fillOval(x - 1, y - 1, circleSize + 2, circleSize + 2);
+        g2.setColor(Color.WHITE);
+        g2.fillOval(x, y, circleSize, circleSize);
+
+        BufferedImage source = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D sg = source.createGraphics();
+        icon.paintIcon(null, sg, 0, 0);
+        sg.dispose();
+
+        double scale = Math.max((double) circleSize / source.getWidth(), (double) circleSize / source.getHeight());
+        int drawWidth = Math.max(1, (int) Math.round(source.getWidth() * scale));
+        int drawHeight = Math.max(1, (int) Math.round(source.getHeight() * scale));
+        int drawX = x + (circleSize - drawWidth) / 2;
+        int drawY = y + (circleSize - drawHeight) / 2;
+
+        g2.setClip(new Ellipse2D.Double(x, y, circleSize, circleSize));
+        g2.drawImage(source, drawX, drawY, drawWidth, drawHeight, null);
+        g2.setClip(null);
+        g2.dispose();
+        return new ImageIcon(canvas);
+    }
+
+    private String getFileExtension(String path) {
+        int dotIndex = path.lastIndexOf('.');
+        return dotIndex >= 0 ? path.substring(dotIndex) : ".png";
+    }
 
     private void styleActionButton(JPanel panel, JLabel label) {
         final Font originalFont = label.getFont();
@@ -205,7 +406,7 @@ public class Staff extends javax.swing.JFrame {
         jPanel1.add(dashb, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 10, -1, -1));
 
         profile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/profile.png"))); // NOI18N
-        jPanel1.add(profile, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 100, 70));
+        jPanel1.add(profile, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 12, 120, 90));
 
         lbName.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         lbName.setForeground(new java.awt.Color(255, 255, 255));
@@ -220,11 +421,11 @@ public class Staff extends javax.swing.JFrame {
 
         LBName.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         LBName.setForeground(new java.awt.Color(255, 255, 255));
-        jPanel1.add(LBName, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 120, 100, 30));
+        jPanel1.add(LBName, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 120, 160, 30));
 
         LBEmail.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         LBEmail.setForeground(new java.awt.Color(255, 255, 255));
-        jPanel1.add(LBEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 160, 120, 30));
+        jPanel1.add(LBEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 160, 160, 30));
 
         jPanel6.setBackground(new java.awt.Color(73, 105, 164));
         jPanel6.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));

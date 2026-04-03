@@ -139,7 +139,7 @@ public class brrw_bks extends javax.swing.JFrame {
 
         booksGrid.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
         galleryScroll.setViewportView(booksGrid);
-        getContentPane().add(galleryScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(156, 8, 384, 342));
+        getContentPane().add(galleryScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 8, 416, 342));
 
         Borrow.setBackground(new java.awt.Color(30, 95, 95));
         Borrow.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -160,7 +160,7 @@ public class brrw_bks extends javax.swing.JFrame {
         });
         Borrow.add(borrow, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 30));
 
-        getContentPane().add(Borrow, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 188, 120, 30));
+        getContentPane().add(Borrow, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 200, 118, 30));
 
         back.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png")));
         back.addMouseListener(new java.awt.event.MouseAdapter() {

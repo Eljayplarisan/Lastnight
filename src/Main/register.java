@@ -2,13 +2,27 @@
 package Main;
 
 import config.config;
+import java.awt.Color;
+import java.awt.Font;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.BorderFactory;
 
 public class register extends javax.swing.JFrame {
 
 
     public register() {
         initComponents();
+        stylePasswordField();
+    }
+
+    private void stylePasswordField() {
+        Password.setBackground(fname.getBackground());
+        Password.setForeground(fname.getForeground());
+        Password.setCaretColor(fname.getForeground());
+        Password.setFont(fname.getFont());
+        Password.setBorder(fname.getBorder());
+        Password.setEchoChar('\u2022');
     }
 
 
@@ -25,9 +39,10 @@ public class register extends javax.swing.JFrame {
         regBTn = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         back = new javax.swing.JLabel();
-        Password = new javax.swing.JTextField();
+        Password = new javax.swing.JPasswordField();
         jLabel8 = new javax.swing.JLabel();
         role = new javax.swing.JComboBox<>();
+        showPassword = new javax.swing.JCheckBox();
         pic = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -86,7 +101,7 @@ public class register extends javax.swing.JFrame {
                 regBTnActionPerformed(evt);
             }
         });
-        getContentPane().add(regBTn, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 290, -1, 30));
+        getContentPane().add(regBTn, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 250, 90, 30));
 
         jLabel7.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
@@ -112,10 +127,21 @@ public class register extends javax.swing.JFrame {
         jLabel8.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
         jLabel8.setText("Role:");
-        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 220, -1, -1));
+        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 220, -1, -1));
 
         role.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "User", "Staff" }));
-        getContentPane().add(role, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 250, 90, -1));
+        getContentPane().add(role, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 250, 90, 30));
+
+        showPassword.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        showPassword.setForeground(new java.awt.Color(255, 255, 255));
+        showPassword.setText("Show Password");
+        showPassword.setContentAreaFilled(false);
+        showPassword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showPasswordActionPerformed(evt);
+            }
+        });
+        getContentPane().add(showPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 220, 130, -1));
 
         pic.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/nn.jpg"))); // NOI18N
         getContentPane().add(pic, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 540, 360));
@@ -129,11 +155,17 @@ public class register extends javax.swing.JFrame {
         String firstName = fname.getText().trim();
         String username = uname.getText().trim();
         String userEmail = email.getText().trim();
-        String userPassword = Password.getText().trim();
+        String userPassword = new String(Password.getPassword()).trim();
         String selectedRole = role.getSelectedItem().toString();
 
         if (firstName.isEmpty() || username.isEmpty() || userEmail.isEmpty() || userPassword.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill in all fields.");
+            return;
+        }
+
+        if (!isValidEmail(userEmail)) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid email like louie1@gmail.com.");
+            email.requestFocus();
             return;
         }
 
@@ -192,6 +224,14 @@ public class register extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_PasswordActionPerformed
 
+    private void showPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showPasswordActionPerformed
+        Password.setEchoChar(showPassword.isSelected() ? (char) 0 : '\u2022');
+    }//GEN-LAST:event_showPasswordActionPerformed
+
+    private boolean isValidEmail(String userEmail) {
+        return userEmail.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    }
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -225,7 +265,7 @@ public class register extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField Password;
+    private javax.swing.JPasswordField Password;
     private javax.swing.JLabel back;
     private javax.swing.JTextField email;
     private javax.swing.JTextField fname;
@@ -237,6 +277,7 @@ public class register extends javax.swing.JFrame {
     private javax.swing.JLabel pic;
     private javax.swing.JButton regBTn;
     private javax.swing.JComboBox<String> role;
+    private javax.swing.JCheckBox showPassword;
     private javax.swing.JTextField uname;
     // End of variables declaration//GEN-END:variables
 }

@@ -118,7 +118,7 @@ public class Return extends javax.swing.JFrame {
 
         booksGrid.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
         galleryScroll.setViewportView(booksGrid);
-        getContentPane().add(galleryScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(156, 8, 384, 342));
+        getContentPane().add(galleryScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 8, 416, 342));
 
         ReturnPanel.setBackground(new java.awt.Color(30, 95, 95));
         ReturnPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -139,7 +139,7 @@ public class Return extends javax.swing.JFrame {
         });
         ReturnPanel.add(RETURN, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 30));
 
-        getContentPane().add(ReturnPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 188, 120, 30));
+        getContentPane().add(ReturnPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 200, 118, 30));
 
         bck.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png")));
         bck.addMouseListener(new java.awt.event.MouseAdapter() {
