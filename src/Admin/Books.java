@@ -46,12 +46,14 @@ public class Books extends javax.swing.JFrame {
         initComponents();
         getContentPane().setComponentZOrder(Frame, getContentPane().getComponentCount() - 1);
         ensureBooksImageColumn();
+        ensureBooksQuantityColumn();
         styleActionButton(add, addbks, add.getBackground());
         styleActionButton(selectImagePanel, selectImageLabel, selectImagePanel.getBackground());
         styleTextField(booktitle);
         styleTextField(author);
         styleTextField(Publisher);
         styleTextField(yearpub);
+        styleTextField(quantity);
         bindPreviewTitle();
         showSelectedImage(null);
 
@@ -72,6 +74,15 @@ public class Books extends javax.swing.JFrame {
         }
     }
 
+    private void ensureBooksQuantityColumn() {
+        try (Connection conn = config.connectDB();
+             PreparedStatement pst = conn.prepareStatement("ALTER TABLE tbl_books ADD COLUMN b_quantity INTEGER DEFAULT 0")) {
+            pst.executeUpdate();
+        } catch (Exception ignored) {
+            // Column already exists or DB rejected duplicate alter; safe to continue.
+        }
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -82,10 +93,12 @@ public class Books extends javax.swing.JFrame {
         b_author = new javax.swing.JLabel();
         b_publsher = new javax.swing.JLabel();
         b_publish = new javax.swing.JLabel();
+        b_quantity = new javax.swing.JLabel();
         add = new javax.swing.JPanel();
         addbks = new javax.swing.JLabel();
         booktitle = new javax.swing.JTextField();
         author = new javax.swing.JTextField();
+        quantity = new javax.swing.JTextField();
         back = new javax.swing.JLabel();
         Frame = new javax.swing.JLabel();
         previewPanel = new javax.swing.JPanel();
@@ -96,7 +109,7 @@ public class Books extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        getContentPane().add(yearpub, new org.netbeans.lib.awtextra.AbsoluteConstraints(75, 240, 170, 30));
+        getContentPane().add(yearpub, new org.netbeans.lib.awtextra.AbsoluteConstraints(75, 240, 80, 30));
         getContentPane().add(Publisher, new org.netbeans.lib.awtextra.AbsoluteConstraints(75, 180, 170, 30));
 
         b_title.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
@@ -118,6 +131,11 @@ public class Books extends javax.swing.JFrame {
         b_publish.setForeground(new java.awt.Color(255, 255, 255));
         b_publish.setText("Year Publish");
         getContentPane().add(b_publish, new org.netbeans.lib.awtextra.AbsoluteConstraints(75, 220, -1, -1));
+
+        b_quantity.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        b_quantity.setForeground(new java.awt.Color(255, 255, 255));
+        b_quantity.setText("Quantity");
+        getContentPane().add(b_quantity, new org.netbeans.lib.awtextra.AbsoluteConstraints(165, 220, -1, -1));
 
         add.setBackground(new java.awt.Color(30, 95, 95));
         add.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -147,6 +165,7 @@ public class Books extends javax.swing.JFrame {
         });
         getContentPane().add(booktitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(75, 60, 170, 30));
         getContentPane().add(author, new org.netbeans.lib.awtextra.AbsoluteConstraints(75, 120, 170, 30));
+        getContentPane().add(quantity, new org.netbeans.lib.awtextra.AbsoluteConstraints(165, 240, 80, 30));
 
         back.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png"))); // NOI18N
         back.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -269,6 +288,7 @@ public class Books extends javax.swing.JFrame {
     private javax.swing.JTextField author;
     private javax.swing.JLabel b_author;
     private javax.swing.JLabel b_publish;
+    private javax.swing.JLabel b_quantity;
     private javax.swing.JLabel b_publsher;
     private javax.swing.JLabel b_title;
     private javax.swing.JLabel back;
@@ -276,6 +296,7 @@ public class Books extends javax.swing.JFrame {
     private javax.swing.JLabel previewImage;
     private javax.swing.JPanel previewPanel;
     private javax.swing.JLabel previewTitle;
+    private javax.swing.JTextField quantity;
     private javax.swing.JPanel selectImagePanel;
     private javax.swing.JLabel selectImageLabel;
     private javax.swing.JTextField yearpub;
@@ -296,16 +317,31 @@ public class Books extends javax.swing.JFrame {
                 || author.getText().trim().isEmpty()
                 || Publisher.getText().trim().isEmpty()
                 || yearpub.getText().trim().isEmpty()
+                || quantity.getText().trim().isEmpty()
                 || selectedImagePath == null) {
-            JOptionPane.showMessageDialog(this, "Please complete all book details and choose an image.");
+            JOptionPane.showMessageDialog(this, "Please complete all book details, quantity, and choose an image.");
+            return;
+        }
+
+        int parsedQuantity;
+        try {
+            parsedQuantity = Integer.parseInt(quantity.getText().trim());
+            if (parsedQuantity <= 0) {
+                JOptionPane.showMessageDialog(this, "Quantity must be greater than zero.");
+                quantity.requestFocusInWindow();
+                return;
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid quantity.");
+            quantity.requestFocusInWindow();
             return;
         }
 
         try {
             String storedImagePath = copyImageToProject(selectedImagePath);
             config con = new config();
-            String sql = "INSERT INTO tbl_books (b_title, b_author, b_publisher, b_publish, b_image) VALUES (?, ?, ?, ?, ?)";
-            con.addRecord(sql, booktitle.getText().trim(), author.getText().trim(), Publisher.getText().trim(), yearpub.getText().trim(), storedImagePath);
+            String sql = "INSERT INTO tbl_books (b_title, b_author, b_publisher, b_publish, b_image, b_quantity) VALUES (?, ?, ?, ?, ?, ?)";
+            con.addRecord(sql, booktitle.getText().trim(), author.getText().trim(), Publisher.getText().trim(), yearpub.getText().trim(), storedImagePath, parsedQuantity);
             JOptionPane.showMessageDialog(this, "Book added successfully.");
             clearForm();
         } catch (Exception e) {
@@ -334,6 +370,7 @@ public class Books extends javax.swing.JFrame {
         author.setText("");
         Publisher.setText("");
         yearpub.setText("");
+        quantity.setText("");
         selectedImagePath = null;
         showSelectedImage(null);
     }

@@ -33,11 +33,12 @@ import javax.swing.JPanel;
 public class borrow extends javax.swing.JFrame {
 
     private final List<BorrowItem> borrowedBooks = new ArrayList<>();
-    private Integer selectedBookId;
+    private Long selectedBorrowRowId;
 
     public borrow() {
         initComponents();
         styleActionButton(deletePanel, deleteLabel, new Color(30, 95, 95));
+        ensureBooksQuantityColumn();
         booksGrid.setOpaque(true);
         booksGrid.setBackground(new Color(14, 14, 18));
         booksGrid.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -64,6 +65,14 @@ public class borrow extends javax.swing.JFrame {
     private void ensureBorrowDateColumn() {
         try (Connection conn = config.connectDB();
              PreparedStatement pst = conn.prepareStatement("ALTER TABLE tbl_borrower ADD COLUMN borrow_date TEXT")) {
+            pst.executeUpdate();
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void ensureBooksQuantityColumn() {
+        try (Connection conn = config.connectDB();
+             PreparedStatement pst = conn.prepareStatement("ALTER TABLE tbl_books ADD COLUMN b_quantity INTEGER DEFAULT 0")) {
             pst.executeUpdate();
         } catch (Exception ignored) {
         }
@@ -98,11 +107,11 @@ public class borrow extends javax.swing.JFrame {
     private void loadBorrowedBooks() {
         borrowedBooks.clear();
         booksGrid.removeAll();
-        selectedBookId = null;
+        selectedBorrowRowId = null;
 
         try (Connection conn = config.connectDB();
              PreparedStatement pst = conn.prepareStatement(
-                     "SELECT br.book_id, " +
+                     "SELECT br.rowid AS borrow_row_id, br.book_id, " +
                      "COALESCE(br.book_title, b.b_title, '') AS book_title, " +
                      "COALESCE(br.book_image, b.b_image, '') AS b_image, " +
                      "br.U_name, br.U_email, " +
@@ -116,11 +125,12 @@ public class borrow extends javax.swing.JFrame {
                      "FROM tbl_borrower br " +
                      "LEFT JOIN tbl_books b ON b.b_id = br.book_id " +
                      "WHERE COALESCE(br.status, '') = 'Borrowed' " +
-                     "ORDER BY br.book_id DESC");
+                     "ORDER BY br.borrow_date DESC, br.rowid DESC");
              ResultSet rs = pst.executeQuery()) {
 
             while (rs.next()) {
                 BorrowItem item = new BorrowItem(
+                        rs.getLong("borrow_row_id"),
                         rs.getInt("book_id"),
                         rs.getString("book_title"),
                         rs.getString("b_image"),
@@ -134,7 +144,7 @@ public class borrow extends javax.swing.JFrame {
             }
 
             if (!borrowedBooks.isEmpty()) {
-                selectedBookId = borrowedBooks.get(0).bookId;
+                selectedBorrowRowId = borrowedBooks.get(0).borrowRowId;
                 highlightSelectedCard();
             }
 
@@ -269,7 +279,7 @@ public class borrow extends javax.swing.JFrame {
         java.awt.event.MouseAdapter clickHandler = new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                selectedBookId = item.bookId;
+                selectedBorrowRowId = item.borrowRowId;
                 highlightSelectedCard();
             }
         };
@@ -287,7 +297,7 @@ public class borrow extends javax.swing.JFrame {
     private void highlightSelectedCard() {
         for (int i = 0; i < booksGrid.getComponentCount(); i++) {
             JPanel card = (JPanel) booksGrid.getComponent(i);
-            if (i < borrowedBooks.size() && borrowedBooks.get(i).bookId == selectedBookId) {
+            if (i < borrowedBooks.size() && borrowedBooks.get(i).borrowRowId == selectedBorrowRowId) {
                 card.setBackground(new Color(22, 34, 58));
                 card.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(new Color(90, 140, 230), 1),
@@ -302,7 +312,7 @@ public class borrow extends javax.swing.JFrame {
     }
 
     private void deleteSelectedBorrowRecord() {
-        if (selectedBookId == null) {
+        if (selectedBorrowRowId == null) {
             JOptionPane.showMessageDialog(this, "Please select a borrowed book first.");
             return;
         }
@@ -312,18 +322,64 @@ public class borrow extends javax.swing.JFrame {
             return;
         }
 
-        try (Connection conn = config.connectDB();
-             PreparedStatement pst = conn.prepareStatement("DELETE FROM tbl_borrower WHERE book_id = ? AND COALESCE(status,'') = 'Borrowed'")) {
-            pst.setInt(1, selectedBookId);
-            int deleted = pst.executeUpdate();
+        Connection conn = null;
+        try {
+            conn = config.connectDB();
+            conn.setAutoCommit(false);
+
+            int bookId = -1;
+            try (PreparedStatement selectPst = conn.prepareStatement(
+                    "SELECT book_id FROM tbl_borrower WHERE rowid = ? AND COALESCE(status,'') = 'Borrowed'")) {
+                selectPst.setLong(1, selectedBorrowRowId);
+                try (ResultSet rs = selectPst.executeQuery()) {
+                    if (rs.next()) {
+                        bookId = rs.getInt("book_id");
+                    }
+                }
+            }
+
+            if (bookId <= 0) {
+                conn.rollback();
+                JOptionPane.showMessageDialog(this, "The selected borrowed record could not be found.");
+                loadBorrowedBooks();
+                return;
+            }
+
+            int deleted;
+            try (PreparedStatement pst = conn.prepareStatement("DELETE FROM tbl_borrower WHERE rowid = ? AND COALESCE(status,'') = 'Borrowed'")) {
+                pst.setLong(1, selectedBorrowRowId);
+                deleted = pst.executeUpdate();
+            }
+
             if (deleted > 0) {
+                try (PreparedStatement stockPst = conn.prepareStatement(
+                        "UPDATE tbl_books SET b_quantity = COALESCE(b_quantity, 0) + 1 WHERE b_id = ?")) {
+                    stockPst.setInt(1, bookId);
+                    stockPst.executeUpdate();
+                }
+                conn.commit();
                 JOptionPane.showMessageDialog(this, "Borrowed record deleted successfully.");
                 loadBorrowedBooks();
             } else {
+                conn.rollback();
                 JOptionPane.showMessageDialog(this, "No borrowed record was deleted.");
             }
         } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (Exception ignored) {
+                }
+            }
             JOptionPane.showMessageDialog(this, "Unable to delete borrowed record: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (Exception ignored) {
+                }
+            }
         }
     }
 
@@ -473,6 +529,7 @@ public class borrow extends javax.swing.JFrame {
     }
 
     private static class BorrowItem {
+        final long borrowRowId;
         final int bookId;
         final String title;
         final String imagePath;
@@ -481,8 +538,9 @@ public class borrow extends javax.swing.JFrame {
         final String borrowDate;
         final String borrowTime;
 
-        BorrowItem(int bookId, String title, String imagePath,
+        BorrowItem(long borrowRowId, int bookId, String title, String imagePath,
                 String borrowerName, String borrowerEmail, String borrowDate, String borrowTime) {
+            this.borrowRowId = borrowRowId;
             this.bookId = bookId;
             this.title = title;
             this.imagePath = imagePath;

@@ -38,6 +38,7 @@ public class brrw_bks extends javax.swing.JFrame {
     public brrw_bks() {
         initComponents();
         styleActionButton(Borrow, borrow, new Color(30, 95, 95));
+        ensureBooksQuantityColumn();
         ensureBorrowDateColumn();
         ensureBorrowBookColumns();
         booksGrid.setOpaque(true);
@@ -68,6 +69,14 @@ public class brrw_bks extends javax.swing.JFrame {
         }
     }
 
+    private void ensureBooksQuantityColumn() {
+        try (Connection conn = config.connectDB();
+             PreparedStatement pst = conn.prepareStatement("ALTER TABLE tbl_books ADD COLUMN b_quantity INTEGER DEFAULT 0")) {
+            pst.executeUpdate();
+        } catch (Exception ignored) {
+        }
+    }
+
     private void ensureBorrowBookColumns() {
         String[] alters = {
             "ALTER TABLE tbl_borrower ADD COLUMN book_title TEXT",
@@ -90,9 +99,12 @@ public class brrw_bks extends javax.swing.JFrame {
 
         try (Connection conn = config.connectDB();
              PreparedStatement pst = conn.prepareStatement(
-                     "SELECT b.b_id, b.b_title, b.b_author, b.b_publisher, b.b_publish, COALESCE(b.b_image, '') AS b_image, " +
-                     "CASE WHEN EXISTS (SELECT 1 FROM tbl_borrower br WHERE br.book_id = b.b_id AND COALESCE(br.status,'') = 'Borrowed') " +
-                     "THEN 'Borrowed' ELSE 'Available' END AS borrow_status " +
+                     "SELECT b.b_id, b.b_title, b.b_author, b.b_publisher, b.b_publish, COALESCE(b.b_image, '') AS b_image, COALESCE(b.b_quantity, 0) AS b_quantity, " +
+                     "CASE " +
+                     "WHEN COALESCE(b.b_quantity, 0) > 0 THEN 'Available' " +
+                     "WHEN EXISTS (SELECT 1 FROM tbl_borrower br WHERE br.book_id = b.b_id AND COALESCE(br.status,'') = 'Borrowed') THEN 'Borrowed' " +
+                     "WHEN EXISTS (SELECT 1 FROM tbl_borrower br WHERE br.book_id = b.b_id AND COALESCE(br.status,'') = 'Pending') THEN 'Pending' " +
+                     "ELSE 'Unavailable' END AS borrow_status " +
                      "FROM tbl_books b ORDER BY b.b_id DESC");
              ResultSet rs = pst.executeQuery()) {
 
@@ -104,7 +116,8 @@ public class brrw_bks extends javax.swing.JFrame {
                         rs.getString("b_publisher"),
                         rs.getString("b_publish"),
                         rs.getString("b_image"),
-                        rs.getString("borrow_status")
+                        rs.getString("borrow_status"),
+                        rs.getInt("b_quantity")
                 );
                 books.add(item);
                 booksGrid.add(createBookCard(item));
@@ -201,7 +214,7 @@ public class brrw_bks extends javax.swing.JFrame {
         card.setOpaque(true);
         card.setBackground(new Color(14, 14, 18));
         card.setBorder(BorderFactory.createEmptyBorder(1, 1, 3, 1));
-        card.setPreferredSize(new Dimension(116, 220));
+        card.setPreferredSize(new Dimension(116, 230));
         card.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         card.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -226,13 +239,23 @@ public class brrw_bks extends javax.swing.JFrame {
         metaLabel.setFont(new Font("Tahoma", Font.PLAIN, 9));
         metaLabel.setForeground(new Color(196, 196, 196));
         metaLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        card.add(metaLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 190, 108, 20));
+        card.add(metaLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 190, 108, 18));
+
+        JLabel quantityLabel = new JLabel("Quantity : " + item.quantity);
+        quantityLabel.setFont(new Font("Tahoma", Font.PLAIN, 9));
+        quantityLabel.setForeground(new Color(170, 220, 255));
+        quantityLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        card.add(quantityLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 206, 108, 10));
 
         JLabel statusLabel = new JLabel("Status : " + safeText(item.status));
         statusLabel.setFont(new Font("Tahoma", Font.PLAIN, 10));
-        statusLabel.setForeground("Borrowed".equalsIgnoreCase(item.status) ? new Color(255, 170, 170) : new Color(170, 255, 190));
+        statusLabel.setForeground(
+                "Borrowed".equalsIgnoreCase(item.status)
+                        ? new Color(255, 170, 170)
+                        : ("Pending".equalsIgnoreCase(item.status) ? new Color(255, 225, 130) : ("Unavailable".equalsIgnoreCase(item.status) ? new Color(255, 170, 170) : new Color(170, 255, 190)))
+        );
         statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        card.add(statusLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 208, 108, 12));
+        card.add(statusLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 216, 108, 12));
 
         java.awt.event.MouseAdapter clickHandler = new java.awt.event.MouseAdapter() {
             @Override
@@ -247,6 +270,7 @@ public class brrw_bks extends javax.swing.JFrame {
         titleLabel.addMouseListener(clickHandler);
         authorLabel.addMouseListener(clickHandler);
         metaLabel.addMouseListener(clickHandler);
+        quantityLabel.addMouseListener(clickHandler);
         statusLabel.addMouseListener(clickHandler);
 
         return card;
@@ -275,7 +299,15 @@ public class brrw_bks extends javax.swing.JFrame {
             return;
         }
         if ("Borrowed".equalsIgnoreCase(selectedStatus)) {
-            JOptionPane.showMessageDialog(this, "This book is already borrowed.");
+            JOptionPane.showMessageDialog(this, "This book is currently unavailable.");
+            return;
+        }
+        if ("Pending".equalsIgnoreCase(selectedStatus)) {
+            JOptionPane.showMessageDialog(this, "This book is currently unavailable.");
+            return;
+        }
+        if ("Unavailable".equalsIgnoreCase(selectedStatus)) {
+            JOptionPane.showMessageDialog(this, "This book is currently unavailable.");
             return;
         }
 
@@ -291,38 +323,46 @@ public class brrw_bks extends javax.swing.JFrame {
             conn = config.connectDB();
             conn.setAutoCommit(false);
 
-            boolean exists;
-            try (PreparedStatement checkPst = conn.prepareStatement("SELECT book_id FROM tbl_borrower WHERE book_id = ?")) {
+            int availableQuantity = 0;
+            try (PreparedStatement checkPst = conn.prepareStatement("SELECT COALESCE(b_quantity, 0) AS b_quantity FROM tbl_books WHERE b_id = ?")) {
                 checkPst.setInt(1, selectedBookId);
                 try (ResultSet rs = checkPst.executeQuery()) {
-                    exists = rs.next();
+                    if (rs.next()) {
+                        availableQuantity = rs.getInt("b_quantity");
+                    }
                 }
             }
 
-            if (exists) {
-                try (PreparedStatement updatePst = conn.prepareStatement(
-                        "UPDATE tbl_borrower SET U_name = ?, U_email = ?, status = 'Borrowed', borrow_date = datetime('now', 'localtime'), book_title = ?, book_image = ? WHERE book_id = ?")) {
-                    updatePst.setString(1, username);
-                    updatePst.setString(2, email);
-                    updatePst.setString(3, getSelectedBookTitle());
-                    updatePst.setString(4, getSelectedBookImage());
-                    updatePst.setInt(5, selectedBookId);
-                    updatePst.executeUpdate();
+            if (availableQuantity <= 0) {
+                conn.rollback();
+                JOptionPane.showMessageDialog(this, "This book is currently unavailable.");
+                loadBooks();
+                return;
+            }
+
+            try (PreparedStatement stockPst = conn.prepareStatement(
+                    "UPDATE tbl_books SET b_quantity = b_quantity - 1 WHERE b_id = ? AND COALESCE(b_quantity, 0) > 0")) {
+                stockPst.setInt(1, selectedBookId);
+                if (stockPst.executeUpdate() == 0) {
+                    conn.rollback();
+                    JOptionPane.showMessageDialog(this, "This book is currently unavailable.");
+                    loadBooks();
+                    return;
                 }
-            } else {
-                try (PreparedStatement insertPst = conn.prepareStatement(
-                        "INSERT INTO tbl_borrower (book_id, U_name, U_email, status, borrow_date, book_title, book_image) VALUES (?, ?, ?, 'Borrowed', datetime('now', 'localtime'), ?, ?)")) {
-                    insertPst.setInt(1, selectedBookId);
-                    insertPst.setString(2, username);
-                    insertPst.setString(3, email);
-                    insertPst.setString(4, getSelectedBookTitle());
-                    insertPst.setString(5, getSelectedBookImage());
-                    insertPst.executeUpdate();
-                }
+            }
+
+            try (PreparedStatement insertPst = conn.prepareStatement(
+                    "INSERT INTO tbl_borrower (book_id, U_name, U_email, status, borrow_date, book_title, book_image) VALUES (?, ?, ?, 'Pending', datetime('now', 'localtime'), ?, ?)")) {
+                insertPst.setInt(1, selectedBookId);
+                insertPst.setString(2, username);
+                insertPst.setString(3, email);
+                insertPst.setString(4, getSelectedBookTitle());
+                insertPst.setString(5, getSelectedBookImage());
+                insertPst.executeUpdate();
             }
 
             conn.commit();
-            JOptionPane.showMessageDialog(this, "Book borrowed successfully.");
+            JOptionPane.showMessageDialog(this, "Borrow request sent successfully. Please wait for admin approval.");
             loadBooks();
         } catch (Exception e) {
             if (conn != null) {
@@ -526,8 +566,9 @@ public class brrw_bks extends javax.swing.JFrame {
         final String publishYear;
         final String imagePath;
         final String status;
+        final int quantity;
 
-        BookItem(int id, String title, String author, String publisher, String publishYear, String imagePath, String status) {
+        BookItem(int id, String title, String author, String publisher, String publishYear, String imagePath, String status, int quantity) {
             this.id = id;
             this.title = title;
             this.author = author;
@@ -535,6 +576,7 @@ public class brrw_bks extends javax.swing.JFrame {
             this.publishYear = publishYear;
             this.imagePath = imagePath;
             this.status = status;
+            this.quantity = quantity;
         }
     }
 }

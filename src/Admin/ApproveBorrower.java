@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package User;
+package Admin;
 
 import Main.login;
 import config.Session;
@@ -29,15 +24,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class Return extends javax.swing.JFrame {
-
-    private final List<BookItem> books = new ArrayList<>();
+public class ApproveBorrower extends javax.swing.JFrame {
+    private final List<PendingBorrowItem> pendingBorrows = new ArrayList<>();
     private Long selectedRequestId;
 
-    public Return() {
+    public ApproveBorrower() {
         initComponents();
-        styleActionButton(ReturnPanel, RETURN, new Color(30, 95, 95));
-        ensureBooksQuantityColumn();
+        styleActionButton(approvePanel, approveLabel, new Color(30, 95, 95));
         booksGrid.setOpaque(true);
         booksGrid.setBackground(new Color(14, 14, 18));
         booksGrid.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -47,8 +40,7 @@ public class Return extends javax.swing.JFrame {
         galleryScroll.getViewport().setOpaque(true);
         galleryScroll.getViewport().setBackground(new Color(14, 14, 18));
         galleryScroll.getVerticalScrollBar().setUnitIncrement(16);
-        getContentPane().setComponentZOrder(frame, getContentPane().getComponentCount() - 1);
-        loadBorrowedBooks();
+        loadPendingBorrowers();
 
         if (!Session.isLoggedIn()) {
             JOptionPane.showMessageDialog(this, "You must login first!");
@@ -58,57 +50,48 @@ public class Return extends javax.swing.JFrame {
         }
     }
 
-    private void ensureBooksQuantityColumn() {
-        try (Connection conn = config.connectDB();
-             PreparedStatement pst = conn.prepareStatement("ALTER TABLE tbl_books ADD COLUMN b_quantity INTEGER DEFAULT 0")) {
-            pst.executeUpdate();
-        } catch (Exception ignored) {
-        }
-    }
-
-    private void loadBorrowedBooks() {
-        books.clear();
+    private void loadPendingBorrowers() {
+        pendingBorrows.clear();
         booksGrid.removeAll();
         selectedRequestId = null;
 
-        String username = Session.getUsername();
-
         try (Connection conn = config.connectDB();
              PreparedStatement pst = conn.prepareStatement(
-                     "SELECT br.rowid AS borrow_row_id, b.b_id, b.b_title, b.b_author, b.b_publisher, b.b_publish, COALESCE(b.b_image, '') AS b_image, br.status " +
-                     "FROM tbl_books b " +
-                     "INNER JOIN tbl_borrower br ON br.book_id = b.b_id " +
-                     "WHERE br.U_name = ? AND COALESCE(br.status,'') = 'Borrowed' " +
-                     "ORDER BY br.borrow_date DESC, br.rowid DESC")) {
+                     "SELECT br.rowid AS borrow_row_id, br.book_id, " +
+                     "COALESCE(br.book_title, b.b_title, '') AS book_title, " +
+                     "COALESCE(br.book_image, b.b_image, '') AS book_image, " +
+                     "COALESCE(br.U_name, '') AS borrower_name, " +
+                     "COALESCE(br.U_email, '') AS borrower_email, " +
+                     "COALESCE(br.status, '') AS status " +
+                     "FROM tbl_borrower br " +
+                     "LEFT JOIN tbl_books b ON b.b_id = br.book_id " +
+                     "WHERE COALESCE(br.status, '') = 'Pending' " +
+                     "ORDER BY br.borrow_date DESC, br.rowid DESC");
+             ResultSet rs = pst.executeQuery()) {
 
-            pst.setString(1, username);
-
-            try (ResultSet rs = pst.executeQuery()) {
-                while (rs.next()) {
-                    BookItem item = new BookItem(
-                            rs.getInt("b_id"),
-                            rs.getLong("borrow_row_id"),
-                            rs.getString("b_title"),
-                            rs.getString("b_author"),
-                            rs.getString("b_publisher"),
-                            rs.getString("b_publish"),
-                            rs.getString("b_image"),
-                            rs.getString("status")
-                    );
-                    books.add(item);
-                    booksGrid.add(createBookCard(item));
-                }
+            while (rs.next()) {
+                PendingBorrowItem item = new PendingBorrowItem(
+                        rs.getLong("borrow_row_id"),
+                        rs.getInt("book_id"),
+                        rs.getString("book_title"),
+                        rs.getString("book_image"),
+                        rs.getString("borrower_name"),
+                        rs.getString("borrower_email"),
+                        rs.getString("status")
+                );
+                pendingBorrows.add(item);
+                booksGrid.add(createBorrowCard(item));
             }
 
-            if (!books.isEmpty()) {
-                selectedRequestId = books.get(0).borrowRowId;
+            if (!pendingBorrows.isEmpty()) {
+                selectedRequestId = pendingBorrows.get(0).borrowRowId;
                 highlightSelectedCard();
             }
 
             booksGrid.revalidate();
             booksGrid.repaint();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Unable to load borrowed books: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Unable to load pending borrowers: " + e.getMessage());
         }
     }
 
@@ -118,9 +101,9 @@ public class Return extends javax.swing.JFrame {
 
         galleryScroll = new javax.swing.JScrollPane();
         booksGrid = new javax.swing.JPanel();
-        ReturnPanel = new javax.swing.JPanel();
-        RETURN = new javax.swing.JLabel();
-        bck = new javax.swing.JLabel();
+        approvePanel = new javax.swing.JPanel();
+        approveLabel = new javax.swing.JLabel();
+        back = new javax.swing.JLabel();
         frame = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -128,64 +111,71 @@ public class Return extends javax.swing.JFrame {
 
         booksGrid.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
         galleryScroll.setViewportView(booksGrid);
+
         getContentPane().add(galleryScroll, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 8, 416, 342));
 
-        ReturnPanel.setBackground(new java.awt.Color(30, 95, 95));
-        ReturnPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        ReturnPanel.addMouseListener(new java.awt.event.MouseAdapter() {
+        approvePanel.setBackground(new java.awt.Color(30, 95, 95));
+        approvePanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        approvePanel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                returnSelectedBook();
+                approveBorrowRequest();
             }
         });
-        ReturnPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        approvePanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        RETURN.setFont(new java.awt.Font("Tahoma", 1, 18));
-        RETURN.setForeground(new java.awt.Color(255, 255, 255));
-        RETURN.setText("Return");
-        RETURN.addMouseListener(new java.awt.event.MouseAdapter() {
+        approveLabel.setFont(new java.awt.Font("Tahoma", 1, 15));
+        approveLabel.setForeground(new java.awt.Color(255, 255, 255));
+        approveLabel.setText("Approve");
+        approveLabel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                returnSelectedBook();
+                approveBorrowRequest();
             }
         });
-        ReturnPanel.add(RETURN, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 30));
+        approvePanel.add(approveLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 30));
 
-        getContentPane().add(ReturnPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 200, 118, 30));
+        getContentPane().add(approvePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 170, 120, 30));
 
-        bck.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png")));
-        bck.addMouseListener(new java.awt.event.MouseAdapter() {
+        back.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/bck.png")));
+        back.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                userDashboard ud = new userDashboard();
-                ud.setVisible(true);
+                Admin ad = new Admin();
+                ad.setVisible(true);
                 dispose();
             }
         });
-        getContentPane().add(bck, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 296, -1, 50));
+        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, 50, 50));
 
         frame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/ima.jpg")));
-        getContentPane().add(frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 360));
+        getContentPane().add(frame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 350));
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Return().setVisible(true);
+    private void approveBorrowRequest() {
+        if (selectedRequestId == null) {
+            JOptionPane.showMessageDialog(this, "Please select a pending borrow request first.");
+            return;
+        }
+
+        try (Connection conn = config.connectDB();
+             PreparedStatement pst = conn.prepareStatement(
+                     "UPDATE tbl_borrower SET status = 'Borrowed' WHERE rowid = ? AND COALESCE(status,'') = 'Pending'")) {
+            pst.setLong(1, selectedRequestId);
+            int updated = pst.executeUpdate();
+            if (updated > 0) {
+                JOptionPane.showMessageDialog(this, "Borrow request approved successfully.");
+                loadPendingBorrowers();
+            } else {
+                JOptionPane.showMessageDialog(this, "The selected pending request could not be approved.");
+                loadPendingBorrowers();
             }
-        });
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Unable to approve borrow request: " + e.getMessage());
+        }
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel RETURN;
-    private javax.swing.JPanel ReturnPanel;
-    private javax.swing.JLabel bck;
-    private javax.swing.JPanel booksGrid;
-    private javax.swing.JLabel frame;
-    private javax.swing.JScrollPane galleryScroll;
-    // End of variables declaration//GEN-END:variables
-
-    private JPanel createBookCard(BookItem item) {
+    private JPanel createBorrowCard(PendingBorrowItem item) {
         JPanel card = new JPanel();
         card.setOpaque(true);
         card.setBackground(new Color(14, 14, 18));
@@ -205,23 +195,23 @@ public class Return extends javax.swing.JFrame {
         titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         card.add(titleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 152, 108, 22));
 
-        JLabel authorLabel = new JLabel("<html><div style='text-align:center;'>Author : " + safeText(item.author) + "</div></html>");
-        authorLabel.setFont(new Font("Tahoma", Font.PLAIN, 10));
-        authorLabel.setForeground(new Color(222, 222, 222));
-        authorLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        card.add(authorLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 174, 108, 16));
+        JLabel nameLabel = new JLabel("<html><div style='text-align:center;'>Name : " + safeText(item.borrowerName) + "</div></html>");
+        nameLabel.setFont(new Font("Tahoma", Font.PLAIN, 10));
+        nameLabel.setForeground(new Color(222, 222, 222));
+        nameLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        card.add(nameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 174, 108, 16));
 
-        JLabel metaLabel = new JLabel("<html><div style='text-align:center;'>Publisher : " + safeText(item.publisher) + "<br>Year Publish : " + safeText(item.publishYear) + "</div></html>");
-        metaLabel.setFont(new Font("Tahoma", Font.PLAIN, 9));
-        metaLabel.setForeground(new Color(196, 196, 196));
-        metaLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        card.add(metaLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 190, 108, 20));
+        JLabel emailLabel = new JLabel("<html><div style='text-align:center;'>Email : " + safeText(item.borrowerEmail) + "</div></html>");
+        emailLabel.setFont(new Font("Tahoma", Font.PLAIN, 9));
+        emailLabel.setForeground(new Color(196, 196, 196));
+        emailLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        card.add(emailLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 190, 108, 16));
 
         JLabel statusLabel = new JLabel("Status : " + safeText(item.status));
         statusLabel.setFont(new Font("Tahoma", Font.PLAIN, 10));
-        statusLabel.setForeground(new Color(255, 170, 170));
+        statusLabel.setForeground(new Color(255, 225, 130));
         statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        card.add(statusLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 208, 108, 12));
+        card.add(statusLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 206, 108, 12));
 
         java.awt.event.MouseAdapter clickHandler = new java.awt.event.MouseAdapter() {
             @Override
@@ -233,8 +223,8 @@ public class Return extends javax.swing.JFrame {
         card.addMouseListener(clickHandler);
         imageLabel.addMouseListener(clickHandler);
         titleLabel.addMouseListener(clickHandler);
-        authorLabel.addMouseListener(clickHandler);
-        metaLabel.addMouseListener(clickHandler);
+        nameLabel.addMouseListener(clickHandler);
+        emailLabel.addMouseListener(clickHandler);
         statusLabel.addMouseListener(clickHandler);
 
         return card;
@@ -243,7 +233,7 @@ public class Return extends javax.swing.JFrame {
     private void highlightSelectedCard() {
         for (int i = 0; i < booksGrid.getComponentCount(); i++) {
             JPanel card = (JPanel) booksGrid.getComponent(i);
-            if (i < books.size() && books.get(i).borrowRowId == selectedRequestId) {
+            if (i < pendingBorrows.size() && pendingBorrows.get(i).borrowRowId == selectedRequestId) {
                 card.setBackground(new Color(22, 34, 58));
                 card.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(new Color(90, 140, 230), 1),
@@ -251,80 +241,10 @@ public class Return extends javax.swing.JFrame {
                 ));
             } else {
                 card.setBackground(new Color(14, 14, 18));
-                card.setBorder(BorderFactory.createEmptyBorder(2, 2, 4, 2));
+                card.setBorder(BorderFactory.createEmptyBorder(1, 1, 3, 1));
             }
         }
         booksGrid.repaint();
-    }
-
-    private void returnSelectedBook() {
-        if (selectedRequestId == null) {
-            JOptionPane.showMessageDialog(this, "Please select a borrowed book first.");
-            return;
-        }
-
-        Connection conn = null;
-        try {
-            conn = config.connectDB();
-            conn.setAutoCommit(false);
-
-            int updated;
-            int bookId = -1;
-            try (PreparedStatement selectPst = conn.prepareStatement(
-                    "SELECT book_id FROM tbl_borrower WHERE rowid = ? AND U_name = ? AND COALESCE(status,'') = 'Borrowed'")) {
-                selectPst.setLong(1, selectedRequestId);
-                selectPst.setString(2, Session.getUsername());
-                try (ResultSet rs = selectPst.executeQuery()) {
-                    if (rs.next()) {
-                        bookId = rs.getInt("book_id");
-                    }
-                }
-            }
-
-            if (bookId <= 0) {
-                conn.rollback();
-                JOptionPane.showMessageDialog(this, "The selected borrowed record could not be found.");
-                loadBorrowedBooks();
-                return;
-            }
-
-            try (PreparedStatement pst = conn.prepareStatement(
-                    "UPDATE tbl_borrower SET status = 'Available' WHERE rowid = ? AND U_name = ? AND COALESCE(status,'') = 'Borrowed'")) {
-                pst.setLong(1, selectedRequestId);
-                pst.setString(2, Session.getUsername());
-                updated = pst.executeUpdate();
-            }
-
-            if (updated > 0) {
-                try (PreparedStatement stockPst = conn.prepareStatement(
-                        "UPDATE tbl_books SET b_quantity = COALESCE(b_quantity, 0) + 1 WHERE b_id = ?")) {
-                    stockPst.setInt(1, bookId);
-                    stockPst.executeUpdate();
-                }
-                conn.commit();
-                JOptionPane.showMessageDialog(this, "Book returned successfully.");
-                loadBorrowedBooks();
-            } else {
-                conn.rollback();
-                JOptionPane.showMessageDialog(this, "No borrowed book was returned.");
-            }
-        } catch (Exception e) {
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (Exception ignored) {
-                }
-            }
-            JOptionPane.showMessageDialog(this, "Unable to return the selected book: " + e.getMessage());
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ignored) {
-                }
-            }
-        }
     }
 
     private ImageIcon loadPosterImage(String imagePath, int width, int height) {
@@ -377,10 +297,10 @@ public class Return extends javax.swing.JFrame {
 
     private void styleActionButton(JPanel panel, JLabel label, Color baseColor) {
         final Font originalFont = label.getFont();
-        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panel.setBorder(BorderFactory.createEmptyBorder());
         panel.setOpaque(false);
         panel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         label.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
@@ -388,7 +308,7 @@ public class Return extends javax.swing.JFrame {
         label.setCursor(new Cursor(Cursor.HAND_CURSOR));
         label.setOpaque(false);
 
-        final javax.swing.JLabel backgroundLabel = new javax.swing.JLabel();
+        final JLabel backgroundLabel = new JLabel();
         backgroundLabel.setBounds(0, 0, Math.max(1, panel.getWidth()), Math.max(1, panel.getHeight()));
         panel.add(backgroundLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
         panel.setComponentZOrder(backgroundLabel, panel.getComponentCount() - 1);
@@ -410,6 +330,7 @@ public class Return extends javax.swing.JFrame {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, true)));
             }
+
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 backgroundLabel.setIcon(new ImageIcon(createGlossyButtonImage(panel.getWidth(), panel.getHeight(), baseColor, false)));
@@ -422,11 +343,11 @@ public class Return extends javax.swing.JFrame {
         fitLabelText(label, originalFont, Math.max(1, panel.getWidth() - 16));
     }
 
-    private void fitLabelText(javax.swing.JLabel label, Font baseFont, int maxWidth) {
+    private void fitLabelText(JLabel label, Font baseFont, int maxWidth) {
         int targetSize = baseFont.getSize();
         while (targetSize > 11) {
             Font testFont = new Font(baseFont.getName(), baseFont.getStyle(), targetSize);
-            int textWidth = label.getFontMetrics(testFont).stringWidth(label.getText().trim());
+            int textWidth = label.getFontMetrics(testFont).stringWidth(label.getText());
             if (textWidth <= maxWidth) {
                 label.setFont(testFont);
                 return;
@@ -442,11 +363,13 @@ public class Return extends javax.swing.JFrame {
         BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = image.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
         Color outer = hover ? adjustColor(baseColor, 55) : adjustColor(baseColor, 35);
         Color top = hover ? adjustColor(baseColor, 22) : adjustColor(baseColor, 8);
         Color bottom = hover ? adjustColor(baseColor, -12) : adjustColor(baseColor, -24);
         Color shineTop = new Color(255, 255, 255, hover ? 180 : 165);
         Color shineBottom = new Color(255, 255, 255, 20);
+
         int arc = h - 2;
         g2.setColor(outer);
         g2.fillRoundRect(0, 0, w - 1, h - 1, arc, arc);
@@ -467,24 +390,39 @@ public class Return extends javax.swing.JFrame {
         return new Color(red, green, blue);
     }
 
-    private static class BookItem {
-        final int id;
+    public static void main(String args[]) {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new ApproveBorrower().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel approveLabel;
+    private javax.swing.JPanel approvePanel;
+    private javax.swing.JLabel back;
+    private javax.swing.JPanel booksGrid;
+    private javax.swing.JLabel frame;
+    private javax.swing.JScrollPane galleryScroll;
+    // End of variables declaration//GEN-END:variables
+
+    private static class PendingBorrowItem {
         final long borrowRowId;
+        final int bookId;
         final String title;
-        final String author;
-        final String publisher;
-        final String publishYear;
         final String imagePath;
+        final String borrowerName;
+        final String borrowerEmail;
         final String status;
 
-        BookItem(int id, long borrowRowId, String title, String author, String publisher, String publishYear, String imagePath, String status) {
-            this.id = id;
+        PendingBorrowItem(long borrowRowId, int bookId, String title, String imagePath, String borrowerName, String borrowerEmail, String status) {
             this.borrowRowId = borrowRowId;
+            this.bookId = bookId;
             this.title = title;
-            this.author = author;
-            this.publisher = publisher;
-            this.publishYear = publishYear;
             this.imagePath = imagePath;
+            this.borrowerName = borrowerName;
+            this.borrowerEmail = borrowerEmail;
             this.status = status;
         }
     }

@@ -48,6 +48,7 @@ public class Admin extends javax.swing.JFrame {
         styleActionButton(addbooks, jLabel1);
         styleActionButton(list, transac);
         styleActionButton(view, book);
+        styleActionButton(approveb, jLabel2);
         styleActionButton(jPanel6, jLabel5);
         ensureProfileImageColumn();
         profile.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -405,6 +406,8 @@ public class Admin extends javax.swing.JFrame {
         transac = new javax.swing.JLabel();
         view = new javax.swing.JPanel();
         book = new javax.swing.JLabel();
+        approveb = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
         background = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -596,6 +599,21 @@ public class Admin extends javax.swing.JFrame {
 
         jPanel7.add(view, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 100, 130, 30));
 
+        approveb.setBackground(new java.awt.Color(73, 105, 164));
+        approveb.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("Approve Borrower");
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+        });
+        approveb.add(jLabel2);
+
+        jPanel7.add(approveb, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 180, 130, 30));
+
         background.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         background.setForeground(new java.awt.Color(255, 255, 255));
         background.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Photo/fan.jpg"))); // NOI18N
@@ -679,6 +697,12 @@ public class Admin extends javax.swing.JFrame {
        this.dispose();
     }//GEN-LAST:event_jLabel1MouseClicked
 
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+        ApproveBorrower ab = new ApproveBorrower();
+        ab.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jLabel2MouseClicked
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -717,11 +741,13 @@ public class Admin extends javax.swing.JFrame {
     private javax.swing.JLabel LBName;
     private javax.swing.JPanel User;
     private javax.swing.JPanel addbooks;
+    private javax.swing.JPanel approveb;
     private javax.swing.JLabel background;
     private javax.swing.JLabel book;
     private javax.swing.JPanel dashboard;
     private javax.swing.JPanel del;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel2;
